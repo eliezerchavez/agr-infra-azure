@@ -15,24 +15,24 @@
 
 This index provides an overview and quick access to all available Terraform modules created to streamline deployments in Azure. Each module is documented comprehensively to facilitate easy integration and consistent cloud infrastructure management.
 
-<p align="right">(<a href="#readme-top-index">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
 ## Available Modules
 
-| Module                                      | Description                                                       | Documentation Link                                           |
-|---------------------------------------------|-------------------------------------------------------------------|--------------------------------------------------------------|
-| [Azure Kubernetes Service (AKS)](aks/)      | Deploys managed Kubernetes clusters on Azure.                     | [AKS Module](aks/README.md)                                  |
-| [Azure Container Registry (ACR)](acr/)      | Provisions Azure Container Registries for Docker image management.| [ACR Module](acr/README.md)                                  |
-| [Azure Redis Cache](redis_cache/)           | Creates highly available Redis Cache instances.                   | [Redis Cache Module](redis_cache/README.md)                  |
-| [Azure Route Table](route_table/)           | Manages network traffic routing with route tables.                | [Route Table Module](route_table/README.md)                  |
-| [Azure Subnet](subnet/)                     | Deploys subnets with optional delegation and service endpoints.   | [Subnet Module](subnet/README.md)                            |
-| [Azure Key Vault](key_vault/)               | Provides secure management of secrets, keys, and certificates.    | [Key Vault Module](key_vault/README.md)                      |
-| [Azure Storage Account](storage_account/)   | Configures Azure storage accounts with containers and file shares.| [Storage Account Module](storage_account/README.md)          |
-| [Azure PostgreSQL Flexible Server](postgres_flexible_server/) | Sets up PostgreSQL databases with flexible scaling options.  | [PostgreSQL Flexible Server Module](postgres_flexible_server/README.md) |
+| Module                                                                  | Description                                                        | 
+|-------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [Azure Kubernetes Service (AKS)](containers/aks/)                       | Deploys managed Kubernetes clusters on Azure.                      |
+| [Azure Container Registry (ACR)](containers/acr/)                       | Provisions Azure Container Registries for Docker image management. |
+| [Azure Redis Cache](databases/redis_cache/)                             | Creates highly available Redis Cache instances.                    |
+| [Azure Route Table](networking/route_table/)                            | Manages network traffic routing with route tables.                 |
+| [Azure Subnet](networking/subnet/)                                      | Deploys subnets with optional delegation and service endpoints.    |
+| [Azure Key Vault](security/key_vault/)                                  | Provides secure management of secrets, keys, and certificates.     |
+| [Azure Storage Account](storage/storage_account/)                       | Configures Azure storage accounts with containers and file shares. |
+| [Azure PostgreSQL Flexible Server](databases/postgres_flexible_server/) | Sets up PostgreSQL databases with flexible scaling options.        |
 
-<p align="right">(<a href="#readme-top-index">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
@@ -50,7 +50,7 @@ module "example_module" {
 }
 ```
 
-<p align="right">(<a href="#readme-top-index">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
