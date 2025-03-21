@@ -1,3 +1,10 @@
+data "azurerm_private_dns_zone" "this" {
+  name                = "privatelink.azurecr.io"
+  resource_group_name = var.pe.rg.name
+
+  provider = azurerm.hub
+}
+
 resource "azurerm_container_registry" "this" {
   admin_enabled                 = var.admin_enabled
   location                      = var.rg.location
@@ -24,13 +31,6 @@ resource "azurerm_container_registry" "this" {
 
 }
 
-data "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.azurecr.io"
-  resource_group_name = var.pe.rg.name
-
-  provider = azurerm.hub
-}
-
 resource "azurerm_private_endpoint" "this" {
   name                = "pe-${var.name}"
   location            = var.rg.location
@@ -52,8 +52,6 @@ resource "azurerm_private_endpoint" "this" {
     private_dns_zone_ids = [data.azurerm_private_dns_zone.this.id]
 
   }
-
-  depends_on = [azurerm_container_registry.this]
 
   provider = azurerm.app
 

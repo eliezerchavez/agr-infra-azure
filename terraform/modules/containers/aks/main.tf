@@ -102,11 +102,12 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   automatic_upgrade_channel           = var.upgrade_channel.automatic
   azure_policy_enabled                = true
-  node_os_upgrade_channel             = var.upgrade_channel.node_os
   dns_prefix                          = var.name
+  node_os_upgrade_channel             = var.upgrade_channel.node_os
+  node_resource_group                 = "rg-${var.name}"
   private_cluster_enabled             = true
-  private_dns_zone_id                 = data.azurerm_private_dns_zone.this.id
   private_cluster_public_fqdn_enabled = false
+  private_dns_zone_id                 = data.azurerm_private_dns_zone.this.id
   # sku_tier                            = "Premium"
 
   default_node_pool {
@@ -122,15 +123,18 @@ resource "azurerm_kubernetes_cluster" "this" {
     upgrade_settings {
       max_surge = "10%"
     }
+
   }
 
   azure_active_directory_role_based_access_control {
     tenant_id = data.azurerm_client_config.current.tenant_id
+
   }
 
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.this.id]
+
   }
 
   maintenance_window_node_os {
@@ -139,6 +143,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     duration   = 8
     start_time = "21:00"
     utc_offset = "-05:00"
+
   }
 
   maintenance_window_auto_upgrade {
@@ -149,6 +154,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     start_time  = "21:00"
     utc_offset  = "-05:00"
     week_index  = "Last"
+
   }
 
   network_profile {
@@ -157,9 +163,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     dns_service_ip = "192.168.128.10"
     pod_cidr       = "192.168.0.0/17"
     service_cidr   = "192.168.128.0/17"
+    
   }
-
-  node_resource_group = "rg-${var.name}"
 
   tags = var.tags
 
