@@ -1,8 +1,3 @@
-variable "platform" {
-  type        = string
-  description = "(Required) The name of the platform hosting multiple applications. This value is used to identify the resource group and all associated resources within the platform."
-}
-
 variable "business_unit" {
   type        = string
   description = "Specifies the Avangrid business unit for which resources are being provisioned. Valid values are 'corporate', 'networks', or 'renewables'."
@@ -46,4 +41,9 @@ variable "net" {
       }))
     })
   })
+}
+
+variable "platform" {
+  type        = string
+  description = "(Required) The name of the platform hosting multiple applications. This value is used to identify the resource group and all associated resources within the platform."
 }

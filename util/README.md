@@ -97,7 +97,13 @@ These scripts are particularly useful when working with Terraform configurations
 
 ## Contributing
 
-Contributions to improve the utility scripts or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Ensure that your changes are tested on both Windows and Unix-based systems.
+Contributions to enhance module functionality or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Remember to update tests as appropriate.
+
+### Accepted Conventions
+
+- [Naming Convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming)
+- [Abbreviation](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
+- [Tagging Strategy](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-tagging)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

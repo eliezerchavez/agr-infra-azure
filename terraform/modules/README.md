@@ -23,14 +23,20 @@ This index provides an overview and quick access to all available Terraform modu
 
 | Module                                                                  | Description                                                        | 
 |-------------------------------------------------------------------------|--------------------------------------------------------------------|
+| **Containers**           ||
 | [Azure Kubernetes Service (AKS)](containers/aks/)                       | Deploys managed Kubernetes clusters on Azure.                      |
 | [Azure Container Registry (ACR)](containers/acr/)                       | Provisions Azure Container Registries for Docker image management. |
+| **Databases**           ||
+| [Azure PostgreSQL Flexible Server](databases/postgres_flexible_server/) | Sets up PostgreSQL databases with flexible scaling options.        |
 | [Azure Redis Cache](databases/redis_cache/)                             | Creates highly available Redis Cache instances.                    |
+| **Networking**           ||
 | [Azure Route Table](networking/route_table/)                            | Manages network traffic routing with route tables.                 |
 | [Azure Subnet](networking/subnet/)                                      | Deploys subnets with optional delegation and service endpoints.    |
+| **Security**           ||
 | [Azure Key Vault](security/key_vault/)                                  | Provides secure management of secrets, keys, and certificates.     |
+| **Storage**           ||
 | [Azure Storage Account](storage/storage_account/)                       | Configures Azure storage accounts with containers and file shares. |
-| [Azure PostgreSQL Flexible Server](databases/postgres_flexible_server/) | Sets up PostgreSQL databases with flexible scaling options.        |
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -44,7 +50,7 @@ Example:
 
 ```hcl
 module "example_module" {
-  source = "../modules/<module_name>"
+  source = "../modules/<category>/<module_name>"
 
   # Module-specific variables
 }

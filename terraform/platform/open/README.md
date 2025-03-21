@@ -15,7 +15,7 @@
 
 ## Description
 
-The Azure Open Platform provides an extensive infrastructure solution designed to support open-source, scalable, and secure applications. Leveraging Azure cloud resources, it facilitates rapid deployment and management of diverse workloads, adhering strictly to cloud best practices for performance, security, and scalability.
+The Azure Open Platform provides an extensive infrastructure solution designed to support cloud native, scalable, and secure applications. Leveraging Azure cloud resources, it facilitates rapid deployment and management of diverse workloads, adhering strictly to cloud best practices for performance, security, and scalability.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -45,6 +45,29 @@ This platform provisions and manages the following Azure resources:
 - **Azure Storage Account**: Highly durable and scalable storage solutions including Blob storage and File shares.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+## Input Variables Overview
+
+| Name            | Type     | Required | Default    | Description                                                                   |
+|-----------------|----------|----------|------------|-------------------------------------------------------------------------------|
+| `business_unit` | `string` | Yes      | n/a        | Business Unit identifier for resource naming and tagging.                     |
+| `env`           | `string` | Yes      | n/a        | Environment identifier (e.g., dev, qa, prod) for resource naming and tagging. |
+| `location`      | `string` | No       | `"eastus"` | Azure region for the platform deployment.                                     |
+| `net`           | `object` | No       | See below  |                                                                               |
+| `platform`      | `string` | No       | `"open"`   | Platform type identifier used in naming resources.                            |
+
+### Network (`net`) Variable Details
+
+| Attribute                | Type          | Required | Default | Description                                                 |
+|--------------------------|---------------|----------|---------|-------------------------------------------------------------|
+| `snet.address_prefix`    | `string`      | Yes      | n/a     | Address prefix for the subnet within the VNet.              |
+| `rt.routes`              | `map(object)` | Yes      | n/a     | Route table entries.                                        |
+| `rt.routes.<name>`       | `object`      | Yes      | n/a     | Individual route entry configuration.                       |
+| `address_prefix`         | `string`      | Yes      | n/a     | Destination CIDR block for route entry.                     |
+| `next_hop_type`          | `string`      | Yes      | n/a     | Next hop type (e.g., VirtualAppliance, Internet).           |
+| `next_hop_in_ip_address` | `string`      | No       | n/a     | Next hop IP address (required if type is VirtualAppliance). |
 
 ---
 
@@ -80,22 +103,21 @@ This platform consists of the following Terraform files:
 
 To deploy the Azure Open Platform, reference this example Terraform module usage snippet:
 
-```hcl
-module "azure_open_platform" {
-  source = "../platform/azure_open_platform"
-
-  resource_group_name = "open-platform-rg"
-  location            = "eastus"
-  aks_cluster_name    = "aks-cluster"
-  acr_name            = "acrcontainer"
-  redis_cache_name    = "redis-cache-instance"
-  postgres_server_name = "postgres-server"
-
-  # Add additional resource-specific variables as needed
-}
+```bash
+source util/setenv.sh
+terraform init -chdir=terraform/platform/open -backend-config="key=platform/<platform type>/<business unit>/<env>/terraform.tfstate"
+terraform plan -chdir=terraform/platform/open -var-file=vars/<env>.tfvars
+terraform apply -chdir=terraform/platform/open -var-file=vars/<env>.tfvars -auto-approve
 ```
 
-Consult the `variables.tf` file for a comprehensive list of configurable parameters.
+i.e.
+
+```bash
+source util/setenv.sh
+terraform init -chdir=terraform/platform/open -backend-config="key=platform/open/corporate/dev/terraform.tfstate"
+terraform plan -chdir=terraform/platform/open -var-file=vars/dev.tfvars
+terraform apply -chdir=terraform/platform/open -var-file=vars/dev.tfvars -auto-approve
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
