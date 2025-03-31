@@ -4,6 +4,10 @@ resource "azurerm_resource_group" "this" {
 
   tags = local.tags
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
 }
 
 data "azurerm_network_security_group" "this" {
@@ -193,6 +197,32 @@ module "redis" {
     id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-DATABASES"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "oai" {
+  source = "../../modules/ai_ml/oai"
+  name   = format("oai-%s-%s", var.platform, var.env)
+
+  sku_name = "S0"
+
+  pe = local.pe
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }
   }
 

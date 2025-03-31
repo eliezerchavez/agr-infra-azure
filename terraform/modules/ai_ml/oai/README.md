@@ -92,7 +92,6 @@ Virtual network integration details.
 | `id`            | `string` | The identifier of the Virtual Network.                      |
 | `subnet.id`     | `string` | The identifier of the Subnet within the Virtual Network.    |
 | `name`          | `string` | The name of the resource group hosting the Virtual Network. |
-| `route_table`   | `object` | *(Optional)* Configuration for an associated route table.   |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

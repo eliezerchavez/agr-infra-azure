@@ -9,16 +9,14 @@ variable "name" {
 
 variable "network_acls" {
   type = object({
-    bypass                = string
-    default_action        = string
-    ip_rules              = list(string)
-    virtual_network_rules = list(string)
+    bypass         = string
+    default_action = string
+    ip_rules       = list(string)
   })
   default = {
-    bypass                = "AzureServices"
-    default_action        = "Deny"
-    ip_rules              = []
-    virtual_network_rules = []
+    bypass         = "AzureServices"
+    default_action = "Deny"
+    ip_rules       = []
   }
 }
 
@@ -32,7 +30,7 @@ variable "pe" {
 
 variable "public_network_access_enabled" {
   type    = bool
-  default = false
+  default = true
 
 }
 
@@ -57,9 +55,6 @@ variable "vnet" {
   type = object({
     id = string
     subnet = object({
-      id = string
-    })
-    route_table = object({
       id = string
     })
   })

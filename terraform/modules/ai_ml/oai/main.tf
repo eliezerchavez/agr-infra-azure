@@ -1,5 +1,5 @@
 data "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.openai.azmk8s.io"
+  name                = "privatelink.openai.azure.com"
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub
@@ -25,11 +25,12 @@ resource "azurerm_cognitive_account" "this" {
   kind     = var.kind
   sku_name = var.sku_name
 
+  custom_subdomain_name = replace(replace(var.name, "oai-", ""), "-", "")
+
   network_acls {
-    bypass                = var.network_acls.bypass
-    default_action        = var.network_acls.default_action
-    ip_rules              = var.network_acls.ip_rules
-    virtual_network_rules = var.network_acls.virtual_network_rules
+    bypass         = var.network_acls.bypass
+    default_action = var.network_acls.default_action
+    ip_rules       = var.network_acls.ip_rules
   }
 
   public_network_access_enabled = var.public_network_access_enabled
