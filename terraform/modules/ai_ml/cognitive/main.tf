@@ -1,5 +1,14 @@
+locals {
+  private_dns_zone = {
+    name = var.kind == "DocumentIntelligence" 
+           ? "privatelink.documentintelligence.azure.com" :  var.kind == "Language" 
+           ? "privatelink.language.azure.com" : var.kind == "OpenAI" 
+           ? "privatelink.openai.azure.com"
+  }
+}
+
 data "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.openai.azure.com"
+  name                = local.private_dns_zone.name
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub
@@ -25,7 +34,12 @@ resource "azurerm_cognitive_account" "this" {
   kind     = var.kind
   sku_name = var.sku_name
 
-  custom_subdomain_name = replace(replace(var.name, "oai-", ""), "-", "")
+  custom_subdomain_name = var.custom_subdomain_name
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = coalesce(var.identity, [azurerm_user_assigned_identity.this.id])
+  }
 
   network_acls {
     bypass         = var.network_acls.bypass

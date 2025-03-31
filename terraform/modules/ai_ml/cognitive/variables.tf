@@ -1,6 +1,14 @@
+variable "custom_subdomain_name" {
+  type    = string
+}
+
+variable "identity" {
+  type    = list(string)
+  default = []
+}
+
 variable "kind" {
   type    = string
-  default = "OpenAI"
 }
 
 variable "name" {
@@ -44,7 +52,7 @@ variable "rg" {
 
 variable "sku_name" {
   type    = string
-  default = "S1"
+  default = "S0"
 }
 
 variable "tags" {

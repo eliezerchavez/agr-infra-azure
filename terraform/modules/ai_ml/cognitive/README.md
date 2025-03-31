@@ -1,8 +1,8 @@
 <a name="readme-top"></a>
 
-# Terraform Module: Azure OpenAI Account
+# Terraform Module: Azure Cognitive Services Account
 
-- [Terraform Module: Azure OpenAI Account](#terraform-module-azure-openai-account)
+- [Terraform Module: Azure Cognitive Services Account](#terraform-module-azure-cognitive-services-account)
   - [Description](#description)
   - [Requirements](#requirements)
   - [Input Variables Overview](#input-variables-overview)
@@ -16,7 +16,7 @@
 
 ## Description
 
-This module provisions an Azure OpenAI Cognitive Service account with secure network connectivity via Private Endpoint. It includes the creation of Azure Cognitive Account, User Assigned Identity, and configuration of Private DNS zone integration.
+This module provisions an Azure Cognitive Services account with secure network connectivity via Private Endpoint. It includes the creation of the Azure Cognitive Services Account, User Assigned Identity, and configuration of Private DNS zone integration.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -36,9 +36,9 @@ This module provisions an Azure OpenAI Cognitive Service account with secure net
 
 | Name                            | Type       | Required | Default           | Description                                              |
 |---------------------------------|------------|----------|-------------------|----------------------------------------------------------|
-| `name`                          | `string`   | Yes      | n/a               | Name for Azure OpenAI Cognitive Service account.         |
+| `name`                          | `string`   | Yes      | n/a               | Name for Azure Cognitive Services account.               |
 | `kind`                          | `string`   | No       | `"OpenAI"`        | Cognitive service type.                                  |
-| `sku_name`                      | `string`   | No       | `"S1"`            | SKU for Azure OpenAI account.                            |
+| `sku_name`                      | `string`   | No       | `"S0"`            | SKU for Azure Cognitive Services account.                |
 | `network_acls`                  | `object`   | No       | See below         | Network access control list configuration.               |
 | `public_network_access_enabled` | `bool`     | No       | `false`           | Whether public network access is enabled.                |
 | `pe`                            | `object`   | Yes      | n/a               | Resource group details for the Private DNS Zone.         |
@@ -91,7 +91,6 @@ Virtual network integration details.
 |-----------------|----------|-------------------------------------------------------------|
 | `id`            | `string` | The identifier of the Virtual Network.                      |
 | `subnet.id`     | `string` | The identifier of the Subnet within the Virtual Network.    |
-| `name`          | `string` | The name of the resource group hosting the Virtual Network. |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -101,7 +100,8 @@ Virtual network integration details.
 
 This module consists of:
 
-- **main.tf**:  
+- **main.tf**:
+  Provisions the:
   - Azure Cognitive Account
   - Azure User Assigned Identity
   - Private Endpoint with DNS Zone integration
@@ -124,8 +124,8 @@ This module consists of:
 ### Example Terraform Configuration
 
 ```hcl
-module "azure_openai" {
-  source              = "../../modules/openai"
+module "oai" {
+  source              = "../../modules/cognitive"
   name                = "openai-prod"
 
   rg = {
@@ -163,10 +163,10 @@ module "azure_openai" {
 
 The module provides these outputs:
 
-| Name   | Description                                         |
-|--------|-----------------------------------------------------|
-| `id`   | ID of the Azure OpenAI Cognitive Service account.   |
-| `name` | Name of the Azure OpenAI Cognitive Service account. |
+| Name   | Description                                   |
+|--------|-----------------------------------------------|
+| `id`   | ID of the Azure Cognitive Services account.   |
+| `name` | Name of the Azure Cognitive Services account. |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
