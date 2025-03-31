@@ -207,11 +207,9 @@ module "redis" {
 
 }
 
-module "oai" {
-  source = "../../modules/ai_ml/oai"
-  name   = format("oai-%s-%s", var.platform, var.env)
-
-  sku_name = "S0"
+module "bot" {
+  source = "../../modules/ai_ml/bot"
+  name   = format("bot-%s-%s", var.platform, var.env)
 
   pe = local.pe
 
@@ -233,4 +231,97 @@ module "oai" {
 
 }
 
+resource "azurerm_user_assigned_identity" "account" {
+  name                = format("id-%s-%s", var.platform, var.env)
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
+}
+
+module "di" { # Document Intelligence
+  source = "../../modules/ai_ml/cognitive"
+  name   = format("di-%s-%s", var.platform, var.env)
+
+  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+
+  kind = "FormRecognizer" 
+
+  pe = local.pe
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "oai" {
+  source = "../../modules/ai_ml/cognitive"
+  name   = format("oai-%s-%s", var.platform, var.env)
+
+  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+
+  kind = "OpenAI"
+
+  pe = local.pe
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "lang" { # Language Service
+  source = "../../modules/ai_ml/cognitive"
+  name   = format("lang-%s-%s", var.platform, var.env)
+
+  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+
+  kind = "TextAnalytics"
+
+  pe = local.pe
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}

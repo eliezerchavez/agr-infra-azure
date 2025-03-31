@@ -4,7 +4,7 @@ data "azurerm_client_config" "current" {
 }
 
 data "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.botframework.com"
+  name                = "privatelink.directline.botframework.com"
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub

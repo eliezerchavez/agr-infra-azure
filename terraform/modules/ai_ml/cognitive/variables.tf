@@ -1,14 +1,12 @@
-variable "custom_subdomain_name" {
-  type    = string
-}
-
 variable "identity" {
-  type    = list(string)
+  type = list(object({
+    id = string
+  }))
   default = []
 }
 
 variable "kind" {
-  type    = string
+  type = string
 }
 
 variable "name" {
