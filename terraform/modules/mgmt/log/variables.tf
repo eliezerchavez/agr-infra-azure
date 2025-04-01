@@ -1,5 +1,6 @@
 variable "daily_quota_gb" {
-  type = optional(number)
+  type = number
+  default = -1
 }
 
 variable "name" {

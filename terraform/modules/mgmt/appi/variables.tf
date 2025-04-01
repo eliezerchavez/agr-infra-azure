@@ -7,6 +7,7 @@ variable "log" {
   type = object({
     id = optional(string)
   })
+  default = {}
 
 }
 

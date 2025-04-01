@@ -9,7 +9,7 @@ variable "cr" {
   type = object({
     id = optional(string)
   })
-  
+
 }
 
 variable "identity" {
@@ -17,6 +17,11 @@ variable "identity" {
     id = string
   }))
   default = []
+}
+
+variable "kind" {
+  type    = string
+  default = "Default"
 }
 
 variable "kv" {
@@ -54,14 +59,14 @@ variable "rg" {
 
 variable "sku_name" {
   type    = string
-  default = "S0"
+  default = "Basic"
 }
 
 variable "storage" {
   type = object({
     id = optional(string)
   })
-
+  default = {}
 }
 
 variable "tags" {

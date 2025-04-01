@@ -19,29 +19,24 @@ resource "azurerm_user_assigned_identity" "this" {
 }
 
 module "st" {
-  count = var.storage.id != "" ? 1 : 0
+  count = try(var.storage.id, null) == null ? 1 : 0
 
-  source = "../storage/st"
+  source = "../../storage/st"
 
-  name = format("sa%s", var.name)
+  name = format("sa%s", replace(var.name, "-", ""))
 
-  pe = local.pe
+  pe = var.pe
 
-  rg = local.rg
+  rg = var.rg
 
   subresource_names = ["blob", "file"]
 
-  tags = local.tags
+  tags = var.tags
 
-  vnet = {
-    id = local.vnet.id
-    subnet = {
-      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-GENERAL"
-    }
-  }
+  vnet = var.vnet
 
   providers = {
-    azurerm.app = azurerm
+    azurerm.app = azurerm.app
     azurerm.hub = azurerm.hub
   }
 
@@ -52,18 +47,20 @@ resource "azurerm_machine_learning_workspace" "this" {
   location            = var.rg.location
   resource_group_name = var.rg.name
 
-  public_network_access_enabled = var.public_network_access_enabled
-  sku_name                      = var.sku_name
+  kind     = var.kind
+  sku_name = var.sku_name
 
   application_insights_id = var.appi.id
-  container_registry_id   = var.cr.id
+  container_registry_id   = try(var.cr.id, null)
   key_vault_id            = var.kv.id
-  storage_account_id      = var.storage.id != "" ? module.st.id : var.storage.id
+  storage_account_id      = try(var.storage.id, null) != null ? var.storage.id : module.st[0].id
 
   identity {
     type         = "UserAssigned"
     identity_ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
   }
+
+  public_network_access_enabled = var.public_network_access_enabled
 
   tags = var.tags
 

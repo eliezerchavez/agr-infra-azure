@@ -1,4 +1,4 @@
-variable "acr" {
+variable "cr" {
   type = object({
     id = optional(string)
   })

@@ -116,7 +116,7 @@ module "aks" {
   source = "../../modules/containers/aks"
   name   = format("aks-%s-%s-%03d", var.platform, var.env, 1)
 
-  acr = { id = local.container.registry.id }
+  cr = { id = local.container.registry.id }
 
   kv = { id = module.kv.id }
 
@@ -319,6 +319,77 @@ module "lang" { # Language Service
   rg = local.rg
 
   sku_name = "S"
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "appi" {
+  source = "../../modules/mgmt/appi"
+  name   = format("appi-%s-%s", var.platform, var.env)
+
+  rg = local.rg
+
+  tags = local.tags
+
+}
+
+module "stmlw" {
+  source = "../../modules/storage/st"
+
+  name = format("sa%s%s%03d", var.platform, var.env, 2)
+
+  pe = local.pe
+
+  rg = local.rg
+
+  subresource_names = ["blob"]
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-GENERAL"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "mlw" {
+  source = "../../modules/ai_ml/mlw"
+  name   = format("mlw-%s-%s", var.platform, var.env)
+
+  appi = { id = module.appi.id }
+
+  cr = { id = local.container.registry.id }
+
+  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+
+  kv = { id = module.kv.id }
+
+  pe = local.pe
+
+  rg = local.rg
+
+  storage = { id = module.stmlw.id }
 
   tags = local.tags
 
