@@ -1,5 +1,5 @@
 data "azurerm_private_dns_zone" "this" {
-  name                = var.kind == "OpenAI" ? "privatelink.openai.azure.com" : "privatelink.cognitiveservices.azure.com"
+  name                = "privatelink.api.azureml.ms"
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub
@@ -18,36 +18,58 @@ resource "azurerm_user_assigned_identity" "this" {
 
 }
 
-resource "azurerm_cognitive_account" "this" {
-  name = var.name
+module "st" {
+  count = var.storage.id != "" ? 1 : 0
 
+  source = "../storage/st"
+
+  name = format("sa%s", var.name)
+
+  pe = local.pe
+
+  rg = local.rg
+
+  subresource_names = ["blob", "file"]
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-GENERAL"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+resource "azurerm_machine_learning_workspace" "this" {
+  name                = var.name
   location            = var.rg.location
   resource_group_name = var.rg.name
 
-  kind     = var.kind
-  sku_name = var.sku_name
+  public_network_access_enabled = var.public_network_access_enabled
+  sku_name                      = var.sku_name
 
-  custom_subdomain_name = var.kind == "OpenAI" ? replace(regex("^.*?-(.*)", var.name)[0], "-", "") : replace(var.name, "-", "")
+  application_insights_id = var.appi.id
+  container_registry_id   = var.cr.id
+  key_vault_id            = var.kv.id
+  storage_account_id      = var.storage.id != "" ? module.st.id : var.storage.id
 
   identity {
     type         = "UserAssigned"
     identity_ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
   }
 
-  network_acls {
-    # bypass         = var.network_acls.bypass
-    default_action = var.network_acls.default_action
-    ip_rules       = var.network_acls.ip_rules
-  }
-
-  public_network_access_enabled = var.public_network_access_enabled
-
   tags = var.tags
 
   lifecycle {
     ignore_changes = [tags]
   }
-
 }
 
 resource "azurerm_private_endpoint" "this" {
@@ -60,7 +82,7 @@ resource "azurerm_private_endpoint" "this" {
 
   private_service_connection {
     name                           = "sc-${var.name}"
-    private_connection_resource_id = azurerm_cognitive_account.this.id
+    private_connection_resource_id = azurerm_machine_learning_workspace.this.id
     subresource_names              = ["account"]
     is_manual_connection           = false
 

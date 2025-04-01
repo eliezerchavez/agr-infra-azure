@@ -1,8 +1,9 @@
 data "azurerm_private_dns_zone" "this" {
-  name                = var.kind == "OpenAI" ? "privatelink.openai.azure.com" : "privatelink.cognitiveservices.azure.com"
+  name                = "privatelink.search.windows.net"
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub
+
 }
 
 resource "azurerm_user_assigned_identity" "this" {
@@ -18,26 +19,23 @@ resource "azurerm_user_assigned_identity" "this" {
 
 }
 
-resource "azurerm_cognitive_account" "this" {
-  name = var.name
-
+resource "azurerm_search_service" "this" {
+  name                = var.name
   location            = var.rg.location
   resource_group_name = var.rg.name
 
-  kind     = var.kind
-  sku_name = var.sku_name
+  sku             = var.sku
+  partition_count = var.partition_count
+  replica_count   = var.replica_count
 
-  custom_subdomain_name = var.kind == "OpenAI" ? replace(regex("^.*?-(.*)", var.name)[0], "-", "") : replace(var.name, "-", "")
+  hosting_mode = var.hosting_mode
+
+  allowed_ips                = var.allowed_ips
+  network_rule_bypass_option = var.network_rule_bypass_option
 
   identity {
     type         = "UserAssigned"
     identity_ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
-  }
-
-  network_acls {
-    # bypass         = var.network_acls.bypass
-    default_action = var.network_acls.default_action
-    ip_rules       = var.network_acls.ip_rules
   }
 
   public_network_access_enabled = var.public_network_access_enabled
@@ -60,8 +58,8 @@ resource "azurerm_private_endpoint" "this" {
 
   private_service_connection {
     name                           = "sc-${var.name}"
-    private_connection_resource_id = azurerm_cognitive_account.this.id
-    subresource_names              = ["account"]
+    private_connection_resource_id = azurerm_search_service.this.id
+    subresource_names              = ["searchService"]
     is_manual_connection           = false
 
   }

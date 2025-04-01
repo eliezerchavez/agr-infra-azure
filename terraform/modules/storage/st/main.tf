@@ -60,7 +60,7 @@ data "azurerm_private_dns_zone" "this" {
 resource "azurerm_private_endpoint" "this" {
   for_each = toset(var.subresource_names)
 
-  name                = "pe-${var.name}-${each.key}"
+  name                = "${var.name}-${each.key}-pe"
   location            = var.rg.location
   resource_group_name = var.rg.name
   subnet_id           = var.vnet.subnet.id

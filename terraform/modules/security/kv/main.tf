@@ -95,7 +95,7 @@ resource "azurerm_key_vault" "this" {
 }
 
 resource "azurerm_private_endpoint" "this" {
-  name                = "pe-${var.name}"
+  name                = "${var.name}-pe"
   location            = var.rg.location
   resource_group_name = var.rg.name
   subnet_id           = var.vnet.subnet.id
