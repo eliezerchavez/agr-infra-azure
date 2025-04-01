@@ -1,28 +1,15 @@
-data "azurerm_client_config" "current" {
-  provider = azurerm.app
-
-}
-
-data "azurerm_private_dns_zone" "bot" {
-  name                = "privatelink.directline.botframework.com"
-  resource_group_name = var.pe.rg.name
-
-  provider = azurerm.hub
-}
-
-data "azurerm_private_dns_zone" "token" {
-  name                = "privatelink.token.botframework.com"
-  resource_group_name = var.pe.rg.name
-
-  provider = azurerm.hub
+locals {
+  subresource_names = ["bot", "token"]
 }
 
 resource "azurerm_bot_channels_registration" "this" {
   name                = var.name
-  location            = var.rg.location
+  location            = "global" # var.rg.location
   resource_group_name = var.rg.name
   sku                 = var.sku
-  microsoft_app_id    = data.azurerm_client_config.current.client_id
+  microsoft_app_id    = var.identity
+
+  public_network_access_enabled = var.public_network_access_enabled
 
   tags = var.tags
 
@@ -31,8 +18,19 @@ resource "azurerm_bot_channels_registration" "this" {
   }
 }
 
+data "azurerm_private_dns_zone" "this" {
+  for_each = toset(local.subresource_names)
+
+  name                = each.key == "bot" ? "privatelink.directline.botframework.com" : "privatelink.${each.key}.botframework.com"
+  resource_group_name = var.pe.rg.name
+
+  provider = azurerm.hub
+}
+
 resource "azurerm_private_endpoint" "this" {
-  name                = "pe-${var.name}"
+  for_each = toset(local.subresource_names)
+
+  name                = "pe-${var.name}-${each.key}"
   location            = var.rg.location
   resource_group_name = var.rg.name
   subnet_id           = var.vnet.subnet.id
@@ -42,16 +40,17 @@ resource "azurerm_private_endpoint" "this" {
   private_service_connection {
     name                           = "sc-${var.name}"
     private_connection_resource_id = azurerm_bot_channels_registration.this.id
-    subresource_names              = ["bot", "token"]
+    subresource_names              = [each.key]
     is_manual_connection           = false
 
   }
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-${var.name}"
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.bot.id, data.azurerm_private_dns_zone.token.id]
-
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.this[each.key].id]
   }
+
+  provider = azurerm.app
 
   lifecycle {
     ignore_changes = [tags]

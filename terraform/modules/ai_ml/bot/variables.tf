@@ -1,3 +1,7 @@
+variable "identity" {
+  type = string
+}
+
 variable "name" {
   type = string
 }
@@ -8,6 +12,12 @@ variable "pe" {
       name = string
     })
   })
+}
+
+variable "public_network_access_enabled" {
+  type    = bool
+  default = false
+
 }
 
 variable "rg" {

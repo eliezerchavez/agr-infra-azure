@@ -207,30 +207,6 @@ module "redis" {
 
 }
 
-# module "bot" {
-#   source = "../../modules/ai_ml/bot"
-#   name   = format("bot-%s-%s", var.platform, var.env)
-
-#   pe = local.pe
-
-#   rg = local.rg
-
-#   tags = local.tags
-
-#   vnet = {
-#     id = local.vnet.id
-#     subnet = {
-#       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
-#     }
-#   }
-
-#   providers = {
-#     azurerm.app = azurerm
-#     azurerm.hub = azurerm.hub
-#   }
-
-# }
-
 resource "azurerm_user_assigned_identity" "account" {
   name                = format("id-%s-%s", var.platform, var.env)
   location            = azurerm_resource_group.this.location
@@ -238,6 +214,32 @@ resource "azurerm_user_assigned_identity" "account" {
 
   lifecycle {
     ignore_changes = [tags]
+  }
+
+}
+
+module "bot" {
+  source = "../../modules/ai_ml/bot"
+  name   = format("bot-%s-%s", var.platform, var.env)
+
+  identity = azurerm_user_assigned_identity.account.client_id
+
+  pe = local.pe
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
   }
 
 }

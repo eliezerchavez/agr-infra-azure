@@ -60,7 +60,7 @@ data "azurerm_private_dns_zone" "this" {
 resource "azurerm_private_endpoint" "this" {
   for_each = toset(var.subresource_names)
 
-  name                = "pe-${var.name}-${each.value}"
+  name                = "pe-${var.name}-${each.key}"
   location            = var.rg.location
   resource_group_name = var.rg.name
   subnet_id           = var.vnet.subnet.id
@@ -70,14 +70,14 @@ resource "azurerm_private_endpoint" "this" {
   private_service_connection {
     name                           = "sc-${var.name}"
     private_connection_resource_id = azurerm_storage_account.this.id
-    subresource_names              = [each.value]
+    subresource_names              = [each.key]
     is_manual_connection           = false
 
   }
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-${var.name}"
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.this[each.value].id]
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.this[each.key].id]
   }
 
   provider = azurerm.app
