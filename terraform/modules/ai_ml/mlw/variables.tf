@@ -64,9 +64,8 @@ variable "sku_name" {
 
 variable "storage" {
   type = object({
-    id = optional(string)
+    id = string
   })
-  default = {}
 }
 
 variable "tags" {

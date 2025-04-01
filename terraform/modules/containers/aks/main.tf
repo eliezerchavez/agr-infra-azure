@@ -179,7 +179,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 }
 
 resource "azurerm_role_assignment" "cr" {
-  count = var.cr.id != null ? 1 : 0
+  count = try(var.cr.id, null) != null ? 1 : 0
 
   scope                = var.cr.id
   role_definition_name = "AcrPull"

@@ -4,7 +4,8 @@ variable "allowed_ips" {
 }
 
 variable "hosting_mode" {
-  type = optional(string)
+  type    = string
+  default = "default"
 }
 
 variable "identity" {
@@ -24,7 +25,8 @@ variable "network_rule_bypass_option" {
 }
 
 variable "partition_count" {
-  type = optional(number)
+  type    = number
+  default = 1
 }
 
 variable "pe" {
@@ -42,7 +44,8 @@ variable "public_network_access_enabled" {
 }
 
 variable "replica_count" {
-  type = optional(number)
+  type    = number
+  default = 0
 }
 
 variable "rg" {

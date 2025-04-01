@@ -406,3 +406,29 @@ module "mlw" {
   }
 
 }
+
+# module "search" {
+#   source = "../../modules/ai_ml/search"
+#   name   = format("search-%s-%s", var.platform, var.env)
+
+#   identity = [{ id = azurerm_user_assigned_identity.account.id }]
+
+#   pe = local.pe
+
+#   rg = local.rg
+
+#   tags = local.tags
+
+#   vnet = {
+#     id = local.vnet.id
+#     subnet = {
+#       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+#     }
+#   }
+
+#   providers = {
+#     azurerm.app = azurerm
+#     azurerm.hub = azurerm.hub
+#   }
+
+# }

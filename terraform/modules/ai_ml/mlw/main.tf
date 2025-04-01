@@ -1,8 +1,24 @@
+locals {
+  identity = {
+    ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
+  }
+}
+
+data "azurerm_client_config" "current" {}
+
 data "azurerm_private_dns_zone" "this" {
   name                = "privatelink.api.azureml.ms"
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub
+}
+
+data "azurerm_user_assigned_identity" "this" {
+  for_each = length(var.identity) > 0 ? toset(var.identity.*.id) : []
+
+  name                = reverse(split("/", each.key))[0]
+  resource_group_name = var.rg.name
+
 }
 
 resource "azurerm_user_assigned_identity" "this" {
@@ -18,28 +34,42 @@ resource "azurerm_user_assigned_identity" "this" {
 
 }
 
-module "st" {
-  count = try(var.storage.id, null) == null ? 1 : 0
+resource "azurerm_role_assignment" "key_vault_reader" {
+  for_each = toset(local.identity.ids)
 
-  source = "../../storage/st"
+  scope                = var.kv.id
+  role_definition_name = "Key Vault Reader"
+  principal_id         = data.azurerm_user_assigned_identity.this[each.key].principal_id
+}
 
-  name = format("sa%s", replace(var.name, "-", ""))
+resource "azurerm_role_assignment" "storage_contributor" {
+  for_each = toset(local.identity.ids)
 
-  pe = var.pe
+  scope                = var.storage.id
+  role_definition_name = "Contributor"
+  principal_id         = data.azurerm_user_assigned_identity.this[each.key].principal_id
+}
 
-  rg = var.rg
+resource "azurerm_role_assignment" "application_insights_contributor" {
+  for_each = toset(local.identity.ids)
 
-  subresource_names = ["blob", "file"]
+  scope                = var.appi.id
+  role_definition_name = "Contributor"
+  principal_id         = data.azurerm_user_assigned_identity.this[each.key].principal_id
+}
 
-  tags = var.tags
+resource "azurerm_role_assignment" "cr" {
+  for_each = try(var.cr.id, null) != null ? toset(local.identity.ids) : []
 
-  vnet = var.vnet
+  scope                = var.cr.id
+  role_definition_name = "AcrPull"
+  principal_id         = data.azurerm_user_assigned_identity.this[each.key].principal_id
 
-  providers = {
-    azurerm.app = azurerm.app
-    azurerm.hub = azurerm.hub
-  }
+}
 
+resource "time_sleep" "wait_for_iam" {
+  depends_on      = [azurerm_role_assignment.key_vault_reader]
+  create_duration = "60s"
 }
 
 resource "azurerm_machine_learning_workspace" "this" {
@@ -53,16 +83,25 @@ resource "azurerm_machine_learning_workspace" "this" {
   application_insights_id = var.appi.id
   container_registry_id   = try(var.cr.id, null)
   key_vault_id            = var.kv.id
-  storage_account_id      = try(var.storage.id, null) != null ? var.storage.id : module.st[0].id
+  storage_account_id      = var.storage.id
 
   identity {
     type         = "UserAssigned"
     identity_ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
   }
 
+  primary_user_assigned_identity = length(var.identity) > 0 ? var.identity[0].id : azurerm_user_assigned_identity.this[0].id
+
   public_network_access_enabled = var.public_network_access_enabled
 
   tags = var.tags
+
+  depends_on = [
+    azurerm_role_assignment.key_vault_reader,
+    azurerm_role_assignment.storage_contributor,
+    azurerm_role_assignment.application_insights_contributor,
+    azurerm_role_assignment.cr
+  ]
 
   lifecycle {
     ignore_changes = [tags]
@@ -80,7 +119,7 @@ resource "azurerm_private_endpoint" "this" {
   private_service_connection {
     name                           = "sc-${var.name}"
     private_connection_resource_id = azurerm_machine_learning_workspace.this.id
-    subresource_names              = ["account"]
+    subresource_names              = ["amlworkspace"]
     is_manual_connection           = false
 
   }

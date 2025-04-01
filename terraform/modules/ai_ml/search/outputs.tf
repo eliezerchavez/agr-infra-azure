@@ -1,7 +1,7 @@
 output "id" {
-  value = azurerm_cognitive_account.this.id
+  value = azurerm_search_service.this.id
 }
 
 output "name" {
-  value = azurerm_cognitive_account.this.name
+  value = azurerm_search_service.this.name
 }

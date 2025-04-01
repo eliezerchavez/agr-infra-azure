@@ -26,7 +26,7 @@ resource "azurerm_search_service" "this" {
 
   sku             = var.sku
   partition_count = var.partition_count
-  replica_count   = var.replica_count
+  replica_count   = var.replica_count == 0 ? null : var.replica_count
 
   hosting_mode = var.hosting_mode
 
