@@ -207,29 +207,29 @@ module "redis" {
 
 }
 
-module "bot" {
-  source = "../../modules/ai_ml/bot"
-  name   = format("bot-%s-%s", var.platform, var.env)
+# module "bot" {
+#   source = "../../modules/ai_ml/bot"
+#   name   = format("bot-%s-%s", var.platform, var.env)
 
-  pe = local.pe
+#   pe = local.pe
 
-  rg = local.rg
+#   rg = local.rg
 
-  tags = local.tags
+#   tags = local.tags
 
-  vnet = {
-    id = local.vnet.id
-    subnet = {
-      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
-    }
-  }
+#   vnet = {
+#     id = local.vnet.id
+#     subnet = {
+#       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+#     }
+#   }
 
-  providers = {
-    azurerm.app = azurerm
-    azurerm.hub = azurerm.hub
-  }
+#   providers = {
+#     azurerm.app = azurerm
+#     azurerm.hub = azurerm.hub
+#   }
 
-}
+# }
 
 resource "azurerm_user_assigned_identity" "account" {
   name                = format("id-%s-%s", var.platform, var.env)
@@ -248,7 +248,7 @@ module "di" { # Document Intelligence
 
   identity = [{ id = azurerm_user_assigned_identity.account.id }]
 
-  kind = "FormRecognizer" 
+  kind = "FormRecognizer"
 
   pe = local.pe
 
@@ -277,6 +277,12 @@ module "oai" {
   identity = [{ id = azurerm_user_assigned_identity.account.id }]
 
   kind = "OpenAI"
+
+  network_acls = {
+    bypass         = "AzureServices"
+    default_action = "Deny"
+    ip_rules       = []
+  }
 
   pe = local.pe
 
@@ -309,6 +315,8 @@ module "lang" { # Language Service
   pe = local.pe
 
   rg = local.rg
+
+  sku_name = "S"
 
   tags = local.tags
 

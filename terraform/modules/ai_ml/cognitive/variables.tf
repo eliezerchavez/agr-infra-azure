@@ -15,12 +15,11 @@ variable "name" {
 
 variable "network_acls" {
   type = object({
-    bypass         = string
+    bypass         = optional(string)
     default_action = string
     ip_rules       = list(string)
   })
   default = {
-    bypass         = "AzureServices"
     default_action = "Deny"
     ip_rules       = []
   }

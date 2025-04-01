@@ -6,6 +6,8 @@ data "azurerm_private_dns_zone" "this" {
 }
 
 resource "azurerm_user_assigned_identity" "this" {
+  count = length(var.identity) == 0 ? 1 : 0
+
   name                = "id-${var.name}"
   location            = var.rg.location
   resource_group_name = var.rg.name
@@ -29,11 +31,11 @@ resource "azurerm_cognitive_account" "this" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = coalesce(var.identity.*.id, [azurerm_user_assigned_identity.this.id])
+    identity_ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
   }
 
   network_acls {
-    bypass         = var.network_acls.bypass
+    # bypass         = var.network_acls.bypass
     default_action = var.network_acls.default_action
     ip_rules       = var.network_acls.ip_rules
   }
@@ -45,7 +47,6 @@ resource "azurerm_cognitive_account" "this" {
   lifecycle {
     ignore_changes = [tags]
   }
-
 
 }
 

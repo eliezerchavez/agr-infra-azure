@@ -3,8 +3,15 @@ data "azurerm_client_config" "current" {
 
 }
 
-data "azurerm_private_dns_zone" "this" {
+data "azurerm_private_dns_zone" "bot" {
   name                = "privatelink.directline.botframework.com"
+  resource_group_name = var.pe.rg.name
+
+  provider = azurerm.hub
+}
+
+data "azurerm_private_dns_zone" "token" {
+  name                = "privatelink.token.botframework.com"
   resource_group_name = var.pe.rg.name
 
   provider = azurerm.hub
@@ -35,14 +42,14 @@ resource "azurerm_private_endpoint" "this" {
   private_service_connection {
     name                           = "sc-${var.name}"
     private_connection_resource_id = azurerm_bot_channels_registration.this.id
-    subresource_names              = ["bot"]
+    subresource_names              = ["bot", "token"]
     is_manual_connection           = false
 
   }
 
   private_dns_zone_group {
     name                 = "private-dns-zone-group-${var.name}"
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.this.id]
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.bot.id, data.azurerm_private_dns_zone.token.id]
 
   }
 
