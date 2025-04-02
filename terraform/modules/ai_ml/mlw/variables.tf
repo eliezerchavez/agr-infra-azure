@@ -45,7 +45,7 @@ variable "pe" {
 
 variable "public_network_access_enabled" {
   type    = bool
-  default = true
+  default = false
 
 }
 
