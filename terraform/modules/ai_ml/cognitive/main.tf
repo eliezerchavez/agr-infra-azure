@@ -1,14 +1,14 @@
 resource "azurerm_user_assigned_identity" "this" {
   count = length(var.identity_ids) > 0 ? 0 : 1
 
-  name                = "id-${var.name}"
+  name                = "${var.name}-id"
   location            = var.rg.location
   resource_group_name = var.rg.name
 
   tags = var.tags
 
   lifecycle {
-ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
+    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 }
 
@@ -37,7 +37,7 @@ resource "azurerm_cognitive_account" "this" {
   tags = var.tags
 
   lifecycle {
-ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
+    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }

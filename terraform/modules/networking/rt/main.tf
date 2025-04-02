@@ -20,7 +20,7 @@ resource "azurerm_route_table" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [route, tags["CreatedAt"], tags["CREATOR"]]
+    ignore_changes = [route, tags]
   }
 
 }

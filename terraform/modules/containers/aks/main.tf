@@ -27,7 +27,7 @@ data "azurerm_client_config" "current" {}
 
 data "azurerm_private_dns_zone" "this" {
   name                = "privatelink.${var.rg.location}.azmk8s.io"
-  resource_group_name = var.pe.rg.name
+  resource_group_name = var.private_dns_rg
 
   provider = azurerm.hub
 }
@@ -39,7 +39,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.this.id]
+    identity_ids = length(var.identity_ids) > 0 ? var.identity_ids : [azurerm_user_assigned_identity.this[0].id]
   }
 
   azure_active_directory_role_based_access_control {
@@ -100,7 +100,12 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   tags = var.tags
 
-  depends_on = [azurerm_role_assignment.this]
+  depends_on = [
+    azurerm_role_assignment.private_dns_zone_contributor,
+    azurerm_role_assignment.reader_and_data_access,
+    azurerm_role_assignment.rt_network_contributor,
+    azurerm_role_assignment.subnet_network_contributor
+  ]
 
   lifecycle {
     ignore_changes = [default_node_pool[0].node_count, private_dns_zone_id, tags["CreatedAt"], tags["CREATOR"]]
