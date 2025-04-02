@@ -216,3 +216,215 @@ module "redis" {
   }
 
 }
+
+resource "azurerm_user_assigned_identity" "account" {
+  name                = format("id-%s-%s", var.platform, var.env)
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
+}
+
+module "bot" {
+  source = "../../modules/ai_ml/bot"
+  name   = format("bot-%s-%s", var.platform, var.env)
+
+  application = {
+    id = azurerm_user_assigned_identity.account.client_id
+  }
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "di" { # Document Intelligence
+  source = "../../modules/ai_ml/cognitive"
+  name   = format("di-%s-%s", var.platform, var.env)
+
+  identity_ids = [azurerm_user_assigned_identity.account.id]
+
+  kind = "FormRecognizer"
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "oai" {
+  source = "../../modules/ai_ml/cognitive"
+  name   = format("oai-%s-%s", var.platform, var.env)
+
+  identity_ids = [azurerm_user_assigned_identity.account.id]
+
+  kind = "OpenAI"
+
+  network_acls = {
+    bypass         = "AzureServices"
+    default_action = "Deny"
+    ip_rules       = []
+  }
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "lang" { # Language Service
+  source = "../../modules/ai_ml/cognitive"
+  name   = format("lang-%s-%s", var.platform, var.env)
+
+  identity_ids = [azurerm_user_assigned_identity.account.id]
+
+  kind = "TextAnalytics"
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  sku_name = "S"
+
+  tags = local.tags
+
+  vnet = {
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "stmlw" {
+  source = "../../modules/storage/st"
+
+  name = format("sa%s%s%03d", var.platform, var.env, 2)
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  subresource_names = ["blob"]
+
+  tags = local.tags
+
+  vnet = {
+    id = local.vnet.id
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-GENERAL"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "mlw" {
+  source = "../../modules/ai_ml/mlw"
+  name   = format("mlw-%s-%s", var.platform, var.env)
+
+  appi = { id = module.appi.id }
+
+  cr = { id = local.container.registry.id }
+
+  identity_ids = [azurerm_user_assigned_identity.account.id]
+
+  kv = { id = module.kv.id }
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  storage = { id = module.stmlw.id }
+
+  tags = local.tags
+
+  vnet = {
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
+
+module "search" {
+  source = "../../modules/ai_ml/search"
+  name   = format("search-%s-%s", var.platform, var.env)
+
+  identity_ids = [azurerm_user_assigned_identity.account.id]
+
+  private_dns_rg = local.pe.rg.name
+
+  rg = local.rg
+
+  tags = local.tags
+
+  vnet = {
+    subnet = {
+      id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
+    }
+  }
+
+  providers = {
+    azurerm.app = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+}
