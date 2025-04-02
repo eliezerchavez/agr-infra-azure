@@ -8,10 +8,17 @@ locals {
   }
 }
 
-data "azurerm_user_assigned_identity" "this" {
-  for_each = toset(var.identity_ids)
+# data "azurerm_user_assigned_identity" "this" {
+#   for_each = length(var.identity_ids) > 0 ? toset(var.identity_ids) : []
 
-  name                = reverse(split("/", each.key))[0]
+#   name                = reverse(split("/", each.key))[0]
+#   resource_group_name = var.rg.name
+# }
+
+data "azurerm_user_assigned_identity" "this" {
+  count = length(var.identity_ids)
+
+  name                = reverse(split("/", var.identity_ids[count.index]))[0]
   resource_group_name = var.rg.name
 
 }
