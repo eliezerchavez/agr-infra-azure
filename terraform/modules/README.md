@@ -82,3 +82,14 @@ Contributions to enhance module functionality or documentation are welcome. Plea
 - [Eliezer Chavez](https://github.com/eliezerchavez) - _Initial Work, Documentation_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- ### Logical Grouping Order
+| Group                    | Example Fields                                                          |
+|--------------------------|-------------------------------------------------------------------------|
+| 🔷 Identity / Basic Info | `name`, `location`, `resource_group_name`                               |
+| 🔐 Security / Identity   | `identity`, `key_vault_id`, etc.                                        |
+| 🌐 Networking            | `vnet_integration`, `private_endpoint`, `public_network_access_enabled` |
+| ⚙️ Settings / Config     | `sku`, `app_id`, `settings`, `version`                                  |
+| 🏷️ Tags                  | `tags`                                                                  |
+| 🔁 Lifecycle             | `lifecycle`, `depends_on`                                               | -->

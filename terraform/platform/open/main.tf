@@ -5,7 +5,7 @@ resource "azurerm_resource_group" "this" {
   tags = local.tags
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }
@@ -213,7 +213,7 @@ resource "azurerm_user_assigned_identity" "account" {
   resource_group_name = azurerm_resource_group.this.name
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }
@@ -222,16 +222,17 @@ module "bot" {
   source = "../../modules/ai_ml/bot"
   name   = format("bot-%s-%s", var.platform, var.env)
 
-  identity = azurerm_user_assigned_identity.account.client_id
+  application = {
+    id = azurerm_user_assigned_identity.account.client_id
+  }
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }
@@ -248,18 +249,17 @@ module "di" { # Document Intelligence
   source = "../../modules/ai_ml/cognitive"
   name   = format("di-%s-%s", var.platform, var.env)
 
-  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+  identity_ids = [azurerm_user_assigned_identity.account.id]
 
   kind = "FormRecognizer"
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }
@@ -276,7 +276,7 @@ module "oai" {
   source = "../../modules/ai_ml/cognitive"
   name   = format("oai-%s-%s", var.platform, var.env)
 
-  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+  identity_ids = [azurerm_user_assigned_identity.account.id]
 
   kind = "OpenAI"
 
@@ -286,14 +286,13 @@ module "oai" {
     ip_rules       = []
   }
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }
@@ -310,11 +309,11 @@ module "lang" { # Language Service
   source = "../../modules/ai_ml/cognitive"
   name   = format("lang-%s-%s", var.platform, var.env)
 
-  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+  identity_ids = [azurerm_user_assigned_identity.account.id]
 
   kind = "TextAnalytics"
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -323,7 +322,6 @@ module "lang" { # Language Service
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }
@@ -381,11 +379,11 @@ module "mlw" {
 
   cr = { id = local.container.registry.id }
 
-  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+  identity_ids = [azurerm_user_assigned_identity.account.id]
 
   kv = { id = module.kv.id }
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -394,7 +392,6 @@ module "mlw" {
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }
@@ -411,16 +408,15 @@ module "search" {
   source = "../../modules/ai_ml/search"
   name   = format("search-%s-%s", var.platform, var.env)
 
-  identity = [{ id = azurerm_user_assigned_identity.account.id }]
+  identity_ids = [azurerm_user_assigned_identity.account.id]
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = "${local.vnet.id}/subnets/${local.vnet.name}-SNET-AZUREAI"
     }

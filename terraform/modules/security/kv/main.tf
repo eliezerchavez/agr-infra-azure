@@ -89,7 +89,7 @@ resource "azurerm_key_vault" "this" {
   provider = azurerm.app
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }
@@ -121,7 +121,7 @@ resource "azurerm_private_endpoint" "this" {
   provider = azurerm.app
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }

@@ -26,7 +26,7 @@ resource "azurerm_redis_cache" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }
@@ -53,7 +53,7 @@ resource "azurerm_private_endpoint" "this" {
   depends_on = [azurerm_redis_cache.this]
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }

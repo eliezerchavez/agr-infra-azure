@@ -43,7 +43,7 @@ resource "azurerm_user_assigned_identity" "this" {
   provider = azurerm.app
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }

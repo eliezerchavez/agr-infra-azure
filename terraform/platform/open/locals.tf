@@ -73,9 +73,7 @@ locals {
   }
 
   container = {
-    registry = {
-      id = data.azurerm_container_registry.this.id
-    }
+    registry = data.azurerm_container_registry.this
   }
 
   pe = {
@@ -84,11 +82,7 @@ locals {
     }
   }
 
-  rg = {
-    id       = azurerm_resource_group.this.id
-    name     = azurerm_resource_group.this.name
-    location = azurerm_resource_group.this.location
-  }
+  rg = azurerm_resource_group.this
 
   tags = {
     APP_ID          = "AP40702"
@@ -98,14 +92,16 @@ locals {
     WORKGROUP       = "USA-INFO TECHNOLOGY"
   }
 
-  vnet = {
-    id   = data.azurerm_virtual_network.net.id
-    name = data.azurerm_virtual_network.net.name
-    rg = {
-      id       = data.azurerm_resource_group.net.id
-      location = data.azurerm_resource_group.net.location
-      name     = data.azurerm_resource_group.net.name
-    }
-  }
+  # vnet = {
+  #   id   = data.azurerm_virtual_network.net.id
+  #   name = data.azurerm_virtual_network.net.name
+  #   rg = {
+  #     id       = data.azurerm_resource_group.net.id
+  #     location = data.azurerm_resource_group.net.location
+  #     name     = data.azurerm_resource_group.net.name
+  #   }
+  # }
+
+  vnet = data.azurerm_virtual_network.net
 
 }

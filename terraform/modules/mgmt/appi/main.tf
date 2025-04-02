@@ -22,7 +22,7 @@ resource "azurerm_application_insights" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }

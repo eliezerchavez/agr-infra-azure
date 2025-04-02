@@ -1,38 +1,29 @@
-data "azurerm_private_dns_zone" "this" {
-  name                = var.kind == "OpenAI" ? "privatelink.openai.azure.com" : "privatelink.cognitiveservices.azure.com"
-  resource_group_name = var.pe.rg.name
-
-  provider = azurerm.hub
-}
-
 resource "azurerm_user_assigned_identity" "this" {
-  count = length(var.identity) == 0 ? 1 : 0
+  count = length(var.identity_ids) > 0 ? 0 : 1
 
   name                = "id-${var.name}"
   location            = var.rg.location
   resource_group_name = var.rg.name
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 
+  lifecycle {
+    ignore_changes = [tags["CreatedAt"]]
+  }
 }
 
 resource "azurerm_cognitive_account" "this" {
-  name = var.name
-
+  name                = var.name
   location            = var.rg.location
   resource_group_name = var.rg.name
 
-  kind     = var.kind
-  sku_name = var.sku_name
-
-  custom_subdomain_name = var.kind == "OpenAI" ? replace(regex("^.*?-(.*)", var.name)[0], "-", "") : replace(var.name, "-", "")
-
   identity {
     type         = "UserAssigned"
-    identity_ids = length(var.identity) > 0 ? var.identity.*.id : [azurerm_user_assigned_identity.this[0].id]
+    identity_ids = length(var.identity_ids) > 0 ? var.identity_ids : [azurerm_user_assigned_identity.this[0].id]
   }
+
+  custom_subdomain_name         = var.kind == "OpenAI" ? replace(regex("^.*?-(.*)", var.name)[0], "-", "") : replace(var.name, "-", "")
+  public_network_access_enabled = var.public_network_access_enabled
 
   network_acls {
     # bypass         = var.network_acls.bypass
@@ -40,40 +31,13 @@ resource "azurerm_cognitive_account" "this" {
     ip_rules       = var.network_acls.ip_rules
   }
 
-  public_network_access_enabled = var.public_network_access_enabled
+  kind     = var.kind
+  sku_name = var.sku_name
 
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [tags]
-  }
-
-}
-
-resource "azurerm_private_endpoint" "this" {
-  name                = "${var.name}-pe"
-  location            = var.rg.location
-  resource_group_name = var.rg.name
-  subnet_id           = var.vnet.subnet.id
-
-  tags = var.tags
-
-  private_service_connection {
-    name                           = "sc-${var.name}"
-    private_connection_resource_id = azurerm_cognitive_account.this.id
-    subresource_names              = ["account"]
-    is_manual_connection           = false
-
-  }
-
-  private_dns_zone_group {
-    name                 = "private-dns-zone-group-${var.name}"
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.this.id]
-
-  }
-
-  lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }

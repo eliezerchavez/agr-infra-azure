@@ -1,14 +1,12 @@
 <a name="readme-top"></a>
 
-# Terraform Module: Azure Bot Service
+# Terraform Module: Azure Application Insights
 
-- [Terraform Module: Azure Bot Service](#terraform-module-azure-bot-service)
+- [Terraform Module: Azure Application Insights](#terraform-module-azure-application-insights)
   - [Description](#description)
   - [Requirements](#requirements)
   - [Input Variables Overview](#input-variables-overview)
-    - [Application (`application`)](#application-application)
     - [Resource Group (`rg`)](#resource-group-rg)
-    - [Virtual Network (`vnet`)](#virtual-network-vnet)
   - [Module Components](#module-components)
   - [Usage](#usage)
   - [Outputs](#outputs)
@@ -19,7 +17,7 @@
 
 ## Description
 
-This module provisions an Azure Bot Service using `azurerm_bot_channels_registration`, and enables secure networking with Private Endpoints and Private DNS zones for the required `directline` and `token` subresources.
+This module provisions an Azure Application Insights instance using `azurerm_application_insights`. It supports resource tagging and SKU customization and can be integrated into observability pipelines such as Azure Monitor or Azure Machine Learning.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -37,36 +35,18 @@ This module provisions an Azure Bot Service using `azurerm_bot_channels_registra
 
 ## Input Variables Overview
 
-| Name                            | Type       | Required | Default                                | Description                                                                   |
-|---------------------------------|------------|----------|----------------------------------------|-------------------------------------------------------------------------------|
-| `application`                   | `object`   | Yes      | n/a                                    | Microsoft App object with the ID to register the bot.                         |
-| `name`                          | `string`   | Yes      | n/a                                    | Globally unique name for the Bot resource.                                    |
-| `private_dns_rg`                | `string`   | No       | `"RG-COMMON-NETWORKING-AZDNS"`         | Resource group where the private DNS zones are located.                       |
-| `public_network_access_enabled` | `bool`     | No       | `false`                                | Whether public network access is enabled.                                     |
-| `rg`                            | `any`      | Yes      | n/a                                    | Full Azure Resource Group object where all module resources will be deployed. |
-| `sku`                           | `string`   | No       | `"F0"`                                 | SKU tier for the Bot resource.                                                |
-| `tags`                          | `map(any)` | Yes      | n/a                                    | Tags to apply to all resources.                                               |
-| `vnet`                          | `object`   | Yes      | n/a                                    | Virtual Network input with the subnet to use for Private Endpoints.           |
-
-### Application (`application`)
-
-| Attribute | Type     | Description                            |
-|-----------|----------|----------------------------------------|
-| `id`      | `string` | Microsoft App ID to link to the Bot.   |
+| Name      | Type       | Required | Default  | Description                                                      |
+|-----------|------------|----------|----------|------------------------------------------------------------------|
+| `name`    | `string`   | Yes      | n/a      | Name for the Application Insights resource.                      |
+| `rg`      | `any`      | Yes      | n/a      | The full Azure Resource Group object.                            |
+| `sku`     | `string`   | No       | `"Basic"`| SKU tier for Application Insights (e.g., `Basic`, `Standard`).   |
+| `tags`    | `map(any)` | Yes      | n/a      | Tags to apply to the resource.                                   |
 
 ### Resource Group (`rg`)
 
-Full Azure Resource Group object. This variable is passed as-is from a data source or parent module output.
+The full Azure Resource Group object. This variable is passed from a data source or parent module.
 
 > ℹ️ Expected to include properties like `id`, `name`, and `location`.
-
-### Virtual Network (`vnet`)
-
-Object representing the Virtual Network and the subnet to be used for Private Endpoint.
-
-| Attribute     | Type     | Description                                            |
-|---------------|----------|--------------------------------------------------------|
-| `subnet.id`   | `string` | ID of the subnet used for the Bot’s Private Endpoints. |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -77,19 +57,13 @@ Object representing the Virtual Network and the subnet to be used for Private En
 This module includes:
 
 - **`main.tf`**  
-  Provisions the Azure Bot Channels Registration resource.
-
-- **`pe.tf`**  
-  Creates Private Endpoints for `directline` and `token`, and connects them to their respective Private DNS zones.
+  Provisions the Azure Application Insights resource.
 
 - **`variables.tf`**  
-  Defines and documents input variables.
+  Declares input variables and default values.
 
 - **`outputs.tf`**  
-  Exposes the main resource outputs (`id`, `name`).
-
-- **`provider.tf`**  
-  Declares required AzureRM providers and aliases for `azurerm.app` and `azurerm.hub`.
+  Exposes outputs such as `id` and `name` for integration with other modules.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -100,30 +74,18 @@ This module includes:
 ### Example Terraform Configuration
 
 ```hcl
-module "bot" {
-  source = "../../modules/ai_ml/bot"
+module "appi" {
+  source = "../../modules/monitoring/appi"
 
-  name = "bot-gaip-dev"
-
-  application = {
-    id = "00000000-0000-0000-0000-000000000000"
-  }
+  name = "appi-gaip-dev"
 
   rg = data.azurerm_resource_group.rg
 
-  vnet = {
-    subnet = {
-      id = "/subscriptions/xxxx/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/hub-vnet/subnets/bot-subnet"
-    }
-  }
-
-  private_dns_rg = "RG-COMMON-NETWORKING-AZDNS"
-
-  public_network_access_enabled = false
+  sku = "Basic"
 
   tags = {
     environment = "dev"
-    project     = "bot-gaip"
+    project     = "gaip"
   }
 }
 ```
@@ -136,10 +98,10 @@ module "bot" {
 
 The module provides these outputs:
 
-| Name   | Description                                     |
-|--------|-------------------------------------------------|
-| `id`   | ID of the Azure Bot Channels Registration.      |
-| `name` | Name of the Azure Bot resource.                 |
+| Name   | Description                                      |
+|--------|--------------------------------------------------|
+| `id`   | The ID of the Application Insights resource.     |
+| `name` | The name of the Application Insights instance.   |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -148,8 +110,6 @@ The module provides these outputs:
 ## Contributing
 
 Contributions to enhance the module’s functionality or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Remember to update tests as appropriate.
-
-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -178,10 +138,6 @@ Contributions to enhance the module’s functionality or documentation are welco
 
 > This grouping helps maintain readability and aligns with Azure best practices for resource declarations.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
-
 ### Variable Declaration Strategy
 
 Variables are intentionally grouped by purpose, not listed alphabetically. This logical ordering improves readability and aligns with the resource layout in the Terraform code itself.
@@ -202,6 +158,6 @@ This grouping also matches the field order used in resource blocks, helping team
 
 ## Credits
 
-- [Eliezer Chavez](https://github.com/eliezerchavez "eliezerchavez") - _Initial Work, Documentation_
+- [Eliezer Chavez](https://github.com/eliezerchavez "eliezerchavez") – _Initial Work, Documentation_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

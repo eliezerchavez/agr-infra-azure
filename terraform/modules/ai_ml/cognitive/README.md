@@ -1,22 +1,25 @@
 <a name="readme-top"></a>
 
-# Terraform Module: Azure Cognitive Services Account
+# Terraform Module: Azure Cognitive Services
 
-- [Terraform Module: Azure Cognitive Services Account](#terraform-module-azure-cognitive-services-account)
+- [Terraform Module: Azure Cognitive Services](#terraform-module-azure-cognitive-services)
   - [Description](#description)
   - [Requirements](#requirements)
   - [Input Variables Overview](#input-variables-overview)
+    - [Resource Group (`rg`)](#resource-group-rg)
+    - [Virtual Network (`vnet`)](#virtual-network-vnet)
   - [Module Components](#module-components)
   - [Usage](#usage)
   - [Outputs](#outputs)
   - [Contributing](#contributing)
+  - [Module Development Guidelines](#module-development-guidelines)
   - [Credits](#credits)
 
 ---
 
 ## Description
 
-This module provisions an Azure Cognitive Services account with secure network connectivity via Private Endpoint. It includes the creation of the Azure Cognitive Services Account, User Assigned Identity, and configuration of Private DNS zone integration.
+This module provisions an Azure Cognitive Account (`azurerm_cognitive_account`) to support AI capabilities such as OpenAI, Form Recognizer (Document Intelligence), and Text Analytics (Language). It handles identity, private networking via Private Endpoints, and DNS zone integration. You can provide your own User Assigned Identity or let the module create one.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -25,7 +28,7 @@ This module provisions an Azure Cognitive Services account with secure network c
 ## Requirements
 
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli): Installed and authenticated.
-- [Terraform](https://developer.hashicorp.com/terraform/downloads): >= 1.0
+- [Terraform](https://developer.hashicorp.com/terraform/downloads): >= 1.0  
   - Provider: [AzureRM](https://registry.terraform.io/providers/hashicorp/azurerm/latest) (>= 3.0)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -34,63 +37,42 @@ This module provisions an Azure Cognitive Services account with secure network c
 
 ## Input Variables Overview
 
-| Name                            | Type       | Required | Default           | Description                                              |
-|---------------------------------|------------|----------|-------------------|----------------------------------------------------------|
-| `name`                          | `string`   | Yes      | n/a               | Name for Azure Cognitive Services account.               |
-| `kind`                          | `string`   | No       | `"OpenAI"`        | Cognitive service type.                                  |
-| `sku_name`                      | `string`   | No       | `"S0"`            | SKU for Azure Cognitive Services account.                |
-| `network_acls`                  | `object`   | No       | See below         | Network access control list configuration.               |
-| `public_network_access_enabled` | `bool`     | No       | `false`           | Whether public network access is enabled.                |
-| `pe`                            | `object`   | Yes      | n/a               | Resource group details for the Private DNS Zone.         |
-| `rg`                            | `object`   | Yes      | n/a               | Resource group details for deployment.                   |
-| `vnet`                          | `object`   | Yes      | n/a               | Virtual network details for private endpoint connection. |
-| `tags`                          | `map(any)` | Yes      | n/a               | Tags for resource identification and management.         |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+| Name                            | Type           | Required | Default                          | Description                                                                        |
+|---------------------------------|----------------|----------|----------------------------------|------------------------------------------------------------------------------------|
+| `identity_ids`                  | `list(string)` | No       | `[]`                             | List of User Assigned Identity IDs. A new identity will be created if empty.       |
+| `kind`                          | `string`       | Yes      | n/a                              | Type of the cognitive service (e.g., `OpenAI`, `FormRecognizer`, `TextAnalytics`). |
+| `name`                          | `string`       | Yes      | n/a                              | Name of the Azure Cognitive Account.                                               |
+| `network_acls`                  | `object`       | No       | See below                        | Network access control rules.                                                      |
+| `private_dns_rg`                | `string`       | No       | `"RG-COMMON-NETWORKING-AZDNS"`   | Resource group where the private DNS zones are located.                            |
+| `public_network_access_enabled` | `bool`         | No       | `true`                           | Whether public network access is enabled.                                          |
+| `rg`                            | `any`          | Yes      | n/a                              | Full Azure Resource Group object where all module resources will be deployed.      |
+| `sku_name`                      | `string`       | No       | `"S0"`                           | SKU tier for the Cognitive Service.                                                |
+| `tags`                          | `map(any)`     | Yes      | n/a                              | Tags to apply to all resources.                                                    |
+| `vnet`                          | `object`       | Yes      | n/a                              | Virtual Network input with the subnet to use for Private Endpoints.                |
 
 ### Network ACLs (`network_acls`)
 
-Configuration for the network-level access to the Azure Cognitive Account. You can define IP allowlists, subnet rules, and general traffic behavior using this structure.
+Optional firewall rules for IP and network restrictions.
 
-| Attribute               | Type           | Required | Default           | Description                                                          |
-|-------------------------|----------------|----------|-------------------|----------------------------------------------------------------------|
-| `bypass`                | `string`       | No       | `"AzureServices"` | Specifies which traffic can bypass the network rules.                |
-| `default_action`        | `string`       | No       | `"Deny"`          | The default action for incoming traffic. Options: `Allow` or `Deny`. |
-| `ip_rules`              | `list(string)` | No       | `[]`              | List of allowed public IP addresses or CIDRs.                        |
-| `virtual_network_rules` | `list(string)` | No       | `[]`              | List of allowed subnet resource IDs for virtual network access.      |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Private Endpoint (`pe`)
-
-Configuration for secure private network access.
-
-| Attribute | Type     | Description                                                     |
-|-----------|----------|-----------------------------------------------------------------|
-| `rg.name` | `string` | The name of the resource group that hosts the private DNS zone. |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+| Attribute        | Type           | Default   | Description                                               |
+|------------------|----------------|-----------|-----------------------------------------------------------|
+| `bypass`         | `string`       | n/a       | Services that can bypass the network rules. *(Optional)*  |
+| `default_action` | `string`       | `"Deny"`  | Default action for traffic not matched by rules.          |
+| `ip_rules`       | `list(string)` | `[]`      | List of allowed public IP ranges or addresses.            |
 
 ### Resource Group (`rg`)
 
-Resource group details for deploying the cluster.
+Full Azure Resource Group object. This variable is passed as-is from a data source or parent module output.
 
-| Attribute  | Type     | Description                                                                 |
-|------------|----------|-----------------------------------------------------------------------------|
-| `id`       | `string` | The resource group identifier (e.g., `/subscriptions/.../myResourceGroup`). |
-| `location` | `string` | The Azure region of the resource group (e.g., `eastus`).                    |
-| `name`     | `string` | The name of the resource group.                                             |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+> ℹ️ Expected to include properties like `id`, `name`, and `location`.
 
 ### Virtual Network (`vnet`)
 
-Virtual network integration details.
+Object representing the Virtual Network and the subnet to be used for Private Endpoint.
 
-| Attribute       | Type     | Description                                                 |
-|-----------------|----------|-------------------------------------------------------------|
-| `id`            | `string` | The identifier of the Virtual Network.                      |
-| `subnet.id`     | `string` | The identifier of the Subnet within the Virtual Network.    |
+| Attribute     | Type     | Description                                                  |
+|---------------|----------|--------------------------------------------------------------|
+| `subnet.id`   | `string` | ID of the subnet used for the Cognitive Service PE.          |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -98,22 +80,22 @@ Virtual network integration details.
 
 ## Module Components
 
-This module consists of:
+This module includes:
 
-- **main.tf**:
-  Provisions the:
-  - Azure Cognitive Account
-  - Azure User Assigned Identity
-  - Private Endpoint with DNS Zone integration
+- **`main.tf`**  
+  Provisions the Azure Cognitive Account and optionally a User Assigned Identity.
 
-- **variables.tf**:  
-  Defines input variables and default values.
+- **`pe.tf`**  
+  Creates the Private Endpoint for the cognitive resource and connects it to the appropriate Private DNS zone.
 
-- **outputs.tf**:  
-  Provides outputs for easy integration.
+- **`variables.tf`**  
+  Defines and documents input variables.
 
-- **provider.tf**:  
-  Specifies required AzureRM providers with aliases.
+- **`outputs.tf`**  
+  Exposes the main resource outputs (`id`, `name`).
+
+- **`provider.tf`**  
+  Declares required AzureRM providers and aliases for `azurerm.app` and `azurerm.hub`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -124,33 +106,29 @@ This module consists of:
 ### Example Terraform Configuration
 
 ```hcl
-module "oai" {
-  source              = "../../modules/cognitive"
-  name                = "openai-prod"
+module "cognitive" {
+  source = "../../modules/ai_ml/cognitive"
 
-  rg = {
-    id       = "/subscriptions/.../resourceGroups/rg-openai"
-    location = "eastus"
-    name     = "rg-openai"
-  }
+  name = "oai-gaip-dev"
+  kind = "OpenAI"
 
-  pe = {
-    rg = { name = "rg-private-dns" }
-  }
+  identity_ids = []
+
+  rg = data.azurerm_resource_group.rg
 
   vnet = {
-    id = "/subscriptions/.../vnet/vnet-prod"
     subnet = {
-      id = "/subscriptions/.../subnets/subnet-openai"
-    }
-    route_table = {
-      id = "/subscriptions/.../routeTables/rt-prod"
+      id = "/subscriptions/xxxx/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/hub-vnet/subnets/oai-subnet"
     }
   }
 
+  private_dns_rg = "RG-COMMON-NETWORKING-AZDNS"
+
+  public_network_access_enabled = false
+
   tags = {
-    environment = "production"
-    project     = "openai"
+    environment = "dev"
+    project     = "gaip"
   }
 }
 ```
@@ -163,10 +141,10 @@ module "oai" {
 
 The module provides these outputs:
 
-| Name   | Description                                   |
-|--------|-----------------------------------------------|
-| `id`   | ID of the Azure Cognitive Services account.   |
-| `name` | Name of the Azure Cognitive Services account. |
+| Name   | Description                                         |
+|--------|-----------------------------------------------------|
+| `id`   | ID of the Azure Cognitive Service resource.         |
+| `name` | Name of the Azure Cognitive Service resource.       |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -183,6 +161,41 @@ Contributions to enhance the module’s functionality or documentation are welco
 - [Naming Convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming)
 - [Abbreviation](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
 - [Tagging Strategy](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-tagging)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+## Module Development Guidelines
+
+### Logical Grouping Order
+
+| Group                    | Example Fields                                                           |
+|--------------------------|--------------------------------------------------------------------------|
+| 🔷 Identity / Basic Info | `name`, `location`, `resource_group_name`                                |
+| 🔐 Security / Identity   | `identity`, `key_vault_id`, `application_insights_id`, etc.              |
+| 🌐 Networking            | `vnet`, `subnet_id`, `private_endpoint`, `public_network_access_enabled` |
+| ⚙️ Settings / Config     | `sku`, `kind`, `custom_subdomain_name`, `settings`, etc.                 |
+| 🏷️ Tags                  | `tags`                                                                   |
+| 🔁 Lifecycle             | `lifecycle`, `depends_on`                                                |
+
+> This grouping helps maintain readability and aligns with Azure best practices for resource declarations.
+
+---
+
+### Variable Declaration Strategy
+
+Variables are intentionally grouped by purpose, not listed alphabetically. This logical ordering improves readability and aligns with the resource layout in the Terraform code itself.
+
+| Group                    | Purpose                                                               |
+|--------------------------|-----------------------------------------------------------------------|
+| 🔷 Identity / Basic Info | Basic resource identifiers and scope (e.g., `name`, `rg`)             |
+| 🔐 Security / Identity   | Identity configuration, Microsoft App IDs, Key Vault, etc.            |
+| 🌐 Networking            | Network-related inputs like `vnet`, `subnet`, Private DNS, endpoints  |
+| ⚙️ Settings / Config     | Configuration options like SKU, versioning, and app-specific settings |
+| 🏷️ Tags                  | Tags used for governance, cost control, or discovery                  |
+
+This grouping also matches the field order used in resource blocks, helping teams onboard quickly and reduce cognitive load.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
