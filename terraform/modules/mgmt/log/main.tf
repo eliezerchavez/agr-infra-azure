@@ -10,7 +10,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }

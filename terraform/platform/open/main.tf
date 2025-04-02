@@ -5,7 +5,7 @@ resource "azurerm_resource_group" "this" {
   tags = local.tags
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }
@@ -212,8 +212,10 @@ resource "azurerm_user_assigned_identity" "account" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
+  tags = local.tags
+
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }
@@ -226,7 +228,7 @@ module "bot" {
     id = azurerm_user_assigned_identity.account.client_id
   }
 
-  private_dns_rg = local.pe.rg
+  private_dns_rg = local.pe.rg.name
 
   rg = local.rg
 
@@ -253,7 +255,7 @@ module "di" { # Document Intelligence
 
   kind = "FormRecognizer"
 
-  private_dns_rg = local.pe.rg
+  private_dns_rg = local.pe.rg.name
 
   rg = local.rg
 
@@ -286,7 +288,7 @@ module "oai" {
     ip_rules       = []
   }
 
-  private_dns_rg = local.pe.rg
+  private_dns_rg = local.pe.rg.name
 
   rg = local.rg
 
@@ -313,7 +315,7 @@ module "lang" { # Language Service
 
   kind = "TextAnalytics"
 
-  private_dns_rg = local.pe.rg
+  private_dns_rg = local.pe.rg.name
 
   rg = local.rg
 
@@ -383,7 +385,7 @@ module "mlw" {
 
   kv = { id = module.kv.id }
 
-  private_dns_rg = local.pe.rg
+  private_dns_rg = local.pe.rg.name
 
   rg = local.rg
 
@@ -410,7 +412,7 @@ module "search" {
 
   identity_ids = [azurerm_user_assigned_identity.account.id]
 
-  private_dns_rg = local.pe.rg
+  private_dns_rg = local.pe.rg.name
 
   rg = local.rg
 

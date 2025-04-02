@@ -6,7 +6,7 @@ resource "azurerm_user_assigned_identity" "this" {
   resource_group_name = var.rg.name
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }
@@ -33,7 +33,7 @@ resource "azurerm_search_service" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }

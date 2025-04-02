@@ -42,8 +42,10 @@ resource "azurerm_user_assigned_identity" "this" {
 
   provider = azurerm.app
 
+  tags = var.tags
+
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }
@@ -163,7 +165,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     dns_service_ip = "192.168.128.10"
     pod_cidr       = "192.168.0.0/17"
     service_cidr   = "192.168.128.0/17"
-    
+
   }
 
   tags = var.tags

@@ -92,16 +92,10 @@ locals {
     WORKGROUP       = "USA-INFO TECHNOLOGY"
   }
 
-  # vnet = {
-  #   id   = data.azurerm_virtual_network.net.id
-  #   name = data.azurerm_virtual_network.net.name
-  #   rg = {
-  #     id       = data.azurerm_resource_group.net.id
-  #     location = data.azurerm_resource_group.net.location
-  #     name     = data.azurerm_resource_group.net.name
-  #   }
-  # }
-
-  vnet = data.azurerm_virtual_network.net
+  vnet = {
+    id   = data.azurerm_virtual_network.net.id
+    name = data.azurerm_virtual_network.net.name
+    rg   = data.azurerm_resource_group.net
+  }
 
 }

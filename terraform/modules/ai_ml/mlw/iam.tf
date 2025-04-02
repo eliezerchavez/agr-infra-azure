@@ -1,11 +1,15 @@
 locals {
   identity = {
-    ids = length(var.identity_ids) > 0 ? data.azurerm_user_assigned_identity.this : azurerm_user_assigned_identity.this
+    ids = (
+      length(var.identity_ids) > 0
+      ? { for k, v in data.azurerm_user_assigned_identity.this : k => { principal_id = v.principal_id } }
+      : { for k, v in azurerm_user_assigned_identity.this : k => { principal_id = v.principal_id } }
+    )
   }
 }
 
 data "azurerm_user_assigned_identity" "this" {
-  for_each = length(var.identity_ids) > 0 ? var.identity_ids : []
+  for_each = length(var.identity_ids) > 0 ? toset(var.identity_ids) : []
 
   name                = reverse(split("/", each.key))[0]
   resource_group_name = var.rg.name
@@ -20,7 +24,7 @@ resource "azurerm_user_assigned_identity" "this" {
   resource_group_name = var.rg.name
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }
@@ -49,8 +53,8 @@ resource "azurerm_role_assignment" "application_insights_component_contributor" 
   principal_id         = each.value.principal_id
 }
 
-resource "azurerm_role_assignment" "cr" {
-  for_each = try(var.cr.id, null) != null ? local.identity.ids : []
+resource "azurerm_role_assignment" "acr_pull" {
+  for_each = try(var.cr.id, null) != null ? local.identity.ids : {}
 
   scope                = var.cr.id
   role_definition_name = "AcrPull"

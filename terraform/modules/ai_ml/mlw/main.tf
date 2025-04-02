@@ -12,7 +12,7 @@ resource "azurerm_machine_learning_workspace" "this" {
     type         = "UserAssigned"
     identity_ids = length(var.identity_ids) > 0 ? var.identity_ids : [azurerm_user_assigned_identity.this[0].id]
   }
-  primary_user_assigned_identity = length(var.identity_ids) > 0 ? var.identity_ids[0].id : [azurerm_user_assigned_identity.this[0].id]
+  primary_user_assigned_identity = length(var.identity_ids) > 0 ? var.identity_ids[0] : azurerm_user_assigned_identity.this[0].id
   key_vault_id                   = var.kv.id
 
   public_network_access_enabled = var.public_network_access_enabled
@@ -26,13 +26,13 @@ resource "azurerm_machine_learning_workspace" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"]]
+ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
   depends_on = [
     azurerm_role_assignment.key_vault_reader,
-    azurerm_role_assignment.storage_contributor,
-    azurerm_role_assignment.application_insights_contributor,
-    azurerm_role_assignment.cr
+    azurerm_role_assignment.storage_blob_data_contributor,
+    azurerm_role_assignment.application_insights_component_contributor,
+    azurerm_role_assignment.acr_pull
   ]
 }
