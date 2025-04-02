@@ -7,12 +7,12 @@
 # 🔷 Identity / Basic Info
 variable "name" {
   type        = string
-  description = "Specifies the name of the Azure Machine Learning Workspace. Must be globally unique within the subscription."
+  description = "Specifies the name of the resource. Must be unique within the scope of the deployment."
 }
 
 variable "rg" {
   type        = any
-  description = "The resource group where all module resources will be deployed."
+  description = "The full Resource Group object where the resource(s) will be deployed. Expected to include 'name' and 'location'."
 }
 
 # ⚙️ Settings / Config
@@ -30,7 +30,7 @@ variable "retention_in_days" {
 variable "sku" {
   type        = string
   default     = "PerGB2018"
-  description = "The SKU of the Log Analytics Workspace. Valid options: Free, PerNode, PerGB2018, Standalone, CapacityReservation, LACluster."
+  description = "The SKU tier for the resource (e.g., Standard, Premium). Use specific object if additional options are needed."
 }
 
 # 🏷️ Tags

@@ -7,19 +7,19 @@
 # 🔷 Identity / Basic Info
 variable "name" {
   type        = string
-  description = "Specifies the name of the Azure Machine Learning Workspace. Must be globally unique within the subscription."
+  description = "Specifies the name of the resource. Must be unique within the scope of the deployment."
 }
 
 variable "rg" {
   type        = any
-  description = "The resource group where all module resources will be deployed."
+  description = "The full Resource Group object where the resource(s) will be deployed. Expected to include 'name' and 'location'."
 }
 
 # 🔐 Security / Identity
 variable "identity_ids" {
   type        = list(string)
   default     = []
-  description = "List of User Assigned Identity IDs. If empty, a new identity will be created automatically."
+  description = "List of User Assigned Managed Identity IDs to assign to the resource. If empty, a new identity may be created."
 }
 
 variable "kv" {
@@ -42,13 +42,7 @@ variable "vnet" {
 variable "private_dns_rg" {
   type        = string
   default     = "RG-COMMON-NETWORKING-AZDNS"
-  description = "Resource group containing the private DNS zones"
-}
-
-variable "public_network_access_enabled" {
-  type        = bool
-  default     = false
-  description = "Whether public network access is enabled for the workspace."
+  description = "Name of the resource group that contains the Private DNS Zones."
 }
 
 variable "network_acls" {
@@ -62,7 +56,12 @@ variable "network_acls" {
     ip_rules       = []
   }
   description = "Network ACLs to define access restrictions. Supports IP allow lists and default action policies."
+}
 
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether the resource allows public network access."
 }
 
 # ⚙️ Settings / Config
@@ -75,7 +74,7 @@ variable "kind" {
 variable "sku_name" {
   type        = string
   default     = "Basic"
-  description = "SKU tier for the Azure Machine Learning Workspace (e.g., Basic, Enterprise)."
+  description = "The SKU tier for the resource (e.g., Standard, Premium). Use specific object if additional options are needed."
 }
 
 variable "appi" {

@@ -35,18 +35,27 @@ This module provisions an Azure Application Insights instance using `azurerm_app
 
 ## Input Variables Overview
 
-| Name      | Type       | Required | Default  | Description                                                      |
-|-----------|------------|----------|----------|------------------------------------------------------------------|
-| `name`    | `string`   | Yes      | n/a      | Name for the Application Insights resource.                      |
-| `rg`      | `any`      | Yes      | n/a      | The full Azure Resource Group object.                            |
-| `sku`     | `string`   | No       | `"Basic"`| SKU tier for Application Insights (e.g., `Basic`, `Standard`).   |
-| `tags`    | `map(any)` | Yes      | n/a      | Tags to apply to the resource.                                   |
+| Name               | Type       | Required | Default | Description                                                   |
+|--------------------|------------|----------|---------|---------------------------------------------------------------|
+| `name`             | `string`   | Yes      | n/a     | Name for the Application Insights resource.                   |
+| `rg`               | `any`      | Yes      | n/a     | The full Azure Resource Group object.                         |
+| `application_type` | `string`   | No       | `"web"` | The type of application to monitor (`web`, `other`).          |
+| `workspace`        | `object`   | No       | `{}`    | *(Optional)* Log Analytics Workspace to link to App Insights. |
+| `tags`             | `map(any)` | Yes      | n/a     | Tags to apply to the resource.                                |
 
 ### Resource Group (`rg`)
 
 The full Azure Resource Group object. This variable is passed from a data source or parent module.
 
 > ℹ️ Expected to include properties like `id`, `name`, and `location`.
+
+### Log Analytics Workspace (`workspace`)
+
+Optional object representing the Log Analytics Workspace to connect to Application Insights.
+
+| Attribute | Type     | Description                             |
+|-----------|----------|-----------------------------------------|
+| `id`      | `string` | ID of the Log Analytics Workspace.      |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -80,8 +89,6 @@ module "appi" {
   name = "appi-gaip-dev"
 
   rg = data.azurerm_resource_group.rg
-
-  sku = "Basic"
 
   tags = {
     environment = "dev"

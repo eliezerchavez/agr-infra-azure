@@ -63,15 +63,9 @@ Optional configuration for subnet delegation.
 
 ### Resource Group (`rg`)
 
-Details of the resource group used for deployment.
+Full Azure Resource Group object. This variable is passed as-is from a data source or parent module output.
 
-| Attribute  | Type     | Required | Default | Description                 |
-|------------|----------|----------|---------|-----------------------------|
-| `id`       | `string` | Yes      | n/a     | Resource group ID.          |
-| `location` | `string` | Yes      | n/a     | Azure region of the group.  |
-| `name`     | `string` | Yes      | n/a     | Name of the resource group. |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+> ℹ️ Expected to include properties like `id`, `name`, and `location`.
 
 ### Virtual Network (`vnet`)
 

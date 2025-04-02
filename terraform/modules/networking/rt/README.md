@@ -36,26 +36,20 @@ This module provisions an Azure Route Table and associated routes, providing a c
 
 ## Input Variables Overview
 
-| Name     | Type           | Required | Default | Description                           |
-|----------|----------------|----------|---------|---------------------------------------|
-| `name`   | `string`       | Yes      | n/a     | Name of the Route Table.              |
-| `rg`     | `object`       | Yes      | n/a     | Resource group configuration.         |
-| `routes` | `list(object)` | Yes      | n/a     | Routes to include in the Route Table. |
-| `tags`   | `map(any)`     | Yes      | n/a     | Tags assigned to resources.           |
+| Name     | Type          | Required | Default | Description                           |
+|----------|---------------|----------|---------|---------------------------------------|
+| `name`   | `string`      | Yes      | n/a     | Name of the Route Table.              |
+| `rg`     | `object`      | Yes      | n/a     | Resource group configuration.         |
+| `routes` | `map(object)` | Yes      | n/a     | Routes to include in the Route Table. |
+| `tags`   | `map(any)`    | Yes      | n/a     | Tags assigned to resources.           |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Resource Group (`rg`)
 
-Details of the resource group used for deployment.
+The full Azure Resource Group object. This variable is passed from a data source or parent module.
 
-| Attribute  | Type     | Required | Default | Description                 |
-|------------|----------|----------|---------|-----------------------------|
-| `id`       | `string` | Yes      | n/a     | Resource group ID.          |
-| `location` | `string` | Yes      | n/a     | Azure region of the group.  |
-| `name`     | `string` | Yes      | n/a     | Name of the resource group. |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+> ℹ️ Expected to include properties like `id`, `name`, and `location`.
 
 ### Routes (`routes`)
 
@@ -125,7 +119,9 @@ The module provides these outputs:
 
 ## Contributing
 
-Contributions to enhance module functionality or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Remember to update tests as appropriate.
+Contributions to enhance the module’s functionality or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Remember to update tests as appropriate.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Accepted Conventions
 
@@ -137,8 +133,41 @@ Contributions to enhance module functionality or documentation are welcome. Plea
 
 ---
 
+## Module Development Guidelines
+
+### Logical Grouping Order
+
+| Group                    | Example Fields                                                           |
+|--------------------------|--------------------------------------------------------------------------|
+| 🔷 Identity / Basic Info | `name`, `location`, `resource_group_name`                                |
+| 🔐 Security / Identity   | `identity`, `key_vault_id`, `application_insights_id`, etc.              |
+| 🌐 Networking            | `vnet`, `subnet_id`, `private_endpoint`, `public_network_access_enabled` |
+| ⚙️ Settings / Config     | `sku`, `app_id`, `custom_subdomain_name`, `settings`, etc.               |
+| 🏷️ Tags                  | `tags`                                                                   |
+| 🔁 Lifecycle             | `lifecycle`, `depends_on`                                                |
+
+> This grouping helps maintain readability and aligns with Azure best practices for resource declarations.
+
+### Variable Declaration Strategy
+
+Variables are intentionally grouped by purpose, not listed alphabetically. This logical ordering improves readability and aligns with the resource layout in the Terraform code itself.
+
+| Group                    | Purpose                                                               |
+|--------------------------|-----------------------------------------------------------------------|
+| 🔷 Identity / Basic Info | Basic resource identifiers and scope (e.g., `name`, `rg`)             |
+| 🔐 Security / Identity   | Identity configuration, Microsoft App IDs, Key Vault, etc.            |
+| 🌐 Networking            | Network-related inputs like `vnet`, `subnet`, Private DNS, endpoints  |
+| ⚙️ Settings / Config     | Configuration options like SKU, versioning, and app-specific settings |
+| 🏷️ Tags                  | Tags used for governance, cost control, or discovery                  |
+
+This grouping also matches the field order used in resource blocks, helping teams onboard quickly and reducing cognitive load.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
 ## Credits
 
-- [Eliezer Chavez](https://github.com/eliezerchavez) - _Initial Work, Documentation_
+- [Eliezer Chavez](https://github.com/eliezerchavez "eliezerchavez") – _Initial Work, Documentation_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

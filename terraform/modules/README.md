@@ -7,13 +7,14 @@
   - [Available Modules](#available-modules)
   - [Usage](#usage)
   - [Contributing](#contributing)
+    - [Accepted Conventions](#accepted-conventions)
   - [Credits](#credits)
 
 ---
 
 ## Description
 
-This index provides an overview and quick access to all available Terraform modules created to streamline deployments in Azure. Each module is documented comprehensively to facilitate easy integration and consistent cloud infrastructure management.
+This index provides an overview and quick access to all available Terraform modules designed to streamline Azure cloud deployments. Each module is comprehensively documented, ensuring ease of integration, consistent infrastructure management, and adherence to best practices.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -21,25 +22,29 @@ This index provides an overview and quick access to all available Terraform modu
 
 ## Available Modules
 
-| Module                                                                  | Description                                                                                                                                     |
-|-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| **AI + Machine Learning**                                               ||
-| [Azure Bot Service](ai_ml/bot/)                                         | Provisions Azure Bot Channels Registration with private networking and optional identity.                                                       |
-| [Azure Cognitive Services](ai_ml/cognitive/)                            | Deploys Cognitive Services (OpenAI, Language, Document Intelligence, etc.) with flexible configuration, private endpoint, and identity support. |
-| **Containers**                                                          ||
-| [Azure Kubernetes Service (AKS)](containers/aks/)                       | Deploys managed Kubernetes clusters on Azure.                                                                                                   |
-| [Azure Container Registry (ACR)](containers/acr/)                       | Provisions Azure Container Registries for Docker image management.                                                                              |
-| **Databases**                                                           ||
-| [Azure PostgreSQL Flexible Server](databases/postgres_flexible_server/) | Sets up PostgreSQL databases with flexible scaling options.                                                                                     |
-| [Azure Redis Cache](databases/redis_cache/)                             | Creates highly available Redis Cache instances.                                                                                                 |
-| **Networking**                                                          ||
-| [Azure Route Table](networking/route_table/)                            | Manages network traffic routing with route tables.                                                                                              |
-| [Azure Subnet](networking/subnet/)                                      | Deploys subnets with optional delegation and service endpoints.                                                                                 |
-| **Security**                                                            ||
-| [Azure Key Vault](security/key_vault/)                                  | Provides secure management of secrets, keys, and certificates.                                                                                  |
-| **Storage**                                                             ||
-| [Azure Storage Account](storage/storage_account/)                       | Configures Azure storage accounts with containers and file shares.                                                                              |
-
+| Module                                                                  | Description                                                                                                                                         |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **AI + Machine Learning**                                               |                                                                                                                                                     |
+| [Azure Bot Service](ai_ml/bot/)                                         | Provisions Azure Bot Channels Registration with secure private endpoints, identity management, and integrated DNS zones.                            |
+| [Azure Cognitive Services](ai_ml/cognitive/)                            | Deploys Azure Cognitive Services (e.g., OpenAI, Document Intelligence, Language Services) with configurable SKU, private networking, and identity.  |
+| [Azure Machine Learning Workspace](ai_ml/mlw/)                          | Provisions Azure Machine Learning Workspace with secure networking, private endpoints, identity management, and integrated resources.               |
+| [Azure Cognitive Search](ai_ml/search/)                                 | Deploys Azure Cognitive Search services, securely integrated via private networking and supporting managed identities.                              |
+| **Containers**                                                          |                                                                                                                                                     |
+| [Azure Kubernetes Service (AKS)](containers/aks/)                       | Provisions and manages fully integrated, secure Azure Kubernetes clusters (AKS) with customizable node pools and networking options.                |
+| [Azure Container Registry (ACR)](containers/acr/)                       | Deploys Azure Container Registries for efficient Docker image storage, management, and secure access with managed identities.                       |
+| **Databases**                                                           |                                                                                                                                                     |
+| [Azure PostgreSQL Flexible Server](databases/postgres_flexible_server/) | Sets up managed PostgreSQL Flexible Servers, offering customizable compute, storage, backups, high availability, and secure networking.             |
+| [Azure Redis Cache](databases/redis_cache/)                             | Creates highly available and scalable Azure Redis Cache instances with private endpoint integration and advanced monitoring support.                |
+| **Management and Governance**                                           |                                                                                                                                                     |
+| [Azure Application Insights](mgmt/appi/)                                | Deploys Application Insights resources to monitor and analyze application performance, including private networking and identity support.           |
+| [Azure Log Analytics Workspace](networking/log/)                        | Provisions Azure Log Analytics Workspaces, enabling centralized logging, analytics, secure ingestion endpoints, and integration with Azure Monitor. |
+| **Networking**                                                          |                                                                                                                                                     |
+| [Azure Route Table](networking/route_table/)                            | Configures Azure Route Tables for advanced network traffic routing, management, and secure subnet associations.                                     |
+| [Azure Subnet](networking/subnet/)                                      | Deploys and configures Azure Subnets, supporting delegation, service endpoints, and network security groups.                                        |
+| **Security**                                                            |                                                                                                                                                     |
+| [Azure Key Vault](security/key_vault/)                                  | Provides secure management of secrets, keys, and certificates, with support for managed identities and private endpoint configurations.             |
+| **Storage**                                                             |                                                                                                                                                     |
+| [Azure Storage Account](storage/storage_account/)                       | Creates Azure Storage Accounts with optimized configurations, containers, file shares, private endpoints, and secure access management.             |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -47,17 +52,19 @@ This index provides an overview and quick access to all available Terraform modu
 
 ## Usage
 
-Each module folder contains a detailed README with usage examples. Refer to the respective documentation for integration instructions.
+Each module folder contains a detailed README file with usage examples and specific input variable guidance. Refer to the respective module documentation for precise integration instructions.
 
-Example:
+**Example usage:**
 
 ```hcl
 module "example_module" {
   source = "../modules/<category>/<module_name>"
 
-  # Module-specific variables
+  # Module-specific variables here
 }
 ```
+
+Replace `<category>` and `<module_name>` with the appropriate module path from the list above.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -82,14 +89,3 @@ Contributions to enhance module functionality or documentation are welcome. Plea
 - [Eliezer Chavez](https://github.com/eliezerchavez) - _Initial Work, Documentation_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<!-- ### Logical Grouping Order
-| Group                    | Example Fields                                                          |
-|--------------------------|-------------------------------------------------------------------------|
-| 🔷 Identity / Basic Info | `name`, `location`, `resource_group_name`                               |
-| 🔐 Security / Identity   | `identity`, `key_vault_id`, etc.                                        |
-| 🌐 Networking            | `vnet_integration`, `private_endpoint`, `public_network_access_enabled` |
-| ⚙️ Settings / Config     | `sku`, `app_id`, `settings`, `version`                                  |
-| 🏷️ Tags                  | `tags`                                                                  |
-| 🔁 Lifecycle             | `lifecycle`, `depends_on`                                               | -->

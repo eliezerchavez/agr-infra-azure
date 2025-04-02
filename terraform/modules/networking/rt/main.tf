@@ -1,8 +1,9 @@
 resource "azurerm_route_table" "this" {
+  name                = var.name
+  resource_group_name = var.rg.name
+  location            = var.rg.location
+
   bgp_route_propagation_enabled = false
-  location                      = var.rg.location
-  name                          = var.name
-  resource_group_name           = var.rg.name
 
   dynamic "route" {
     for_each = var.routes
@@ -19,7 +20,7 @@ resource "azurerm_route_table" "this" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [route, tags]
+    ignore_changes = [route, tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }

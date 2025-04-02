@@ -7,27 +7,28 @@
 # 🔷 Identity / Basic Info
 variable "name" {
   type        = string
-  description = "Specifies the name of the Azure Machine Learning Workspace. Must be globally unique within the subscription."
+  description = "Specifies the name of the resource. Must be unique within the scope of the deployment."
 }
 
 variable "rg" {
   type        = any
-  description = "The resource group where all module resources will be deployed."
+  description = "The full Resource Group object where the resource(s) will be deployed. Expected to include 'name' and 'location'."
 }
 
 # ⚙️ Settings / Config
 
 variable "application_type" {
-  type    = string
-  default = "web"
+  type        = string
+  default     = "web"
+  description = "The type of Application Insights to create. Common values are 'web', 'other', 'node.js'."
 }
 
-variable "log" {
+variable "workspace" {
   type = object({
     id = optional(string)
   })
-  default = {}
-
+  default     = {}
+  description = "The ID of the Log Analytics Workspace to link this Application Insights instance to."
 }
 
 # 🏷️ Tags

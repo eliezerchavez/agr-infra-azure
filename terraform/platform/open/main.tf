@@ -5,7 +5,7 @@ resource "azurerm_resource_group" "this" {
   tags = local.tags
 
   lifecycle {
-    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }
@@ -65,7 +65,7 @@ module "kv" {
 
   name = format("kv-%s-%s", var.platform, var.env)
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -90,7 +90,7 @@ module "st" {
 
   name = format("sa%s%s%03d", var.platform, var.env, 1)
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -134,7 +134,7 @@ module "aks" {
     }
   }
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -143,13 +143,13 @@ module "aks" {
   tags = local.tags
 
   vnet = {
-    id = local.vnet.id
     subnet = {
       id = module.snet.id
     }
-    route_table = {
-      id = module.rt.id
-    }
+  }
+
+  rt = {
+    id = module.rt.id
   }
 
   providers = {
@@ -163,7 +163,7 @@ module "pgsql" {
   source = "../../modules/databases/postgres/flexible"
   name   = format("psql-%s-%s-%03d", var.platform, var.env, 1)
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -187,7 +187,7 @@ module "redis" {
   source = "../../modules/databases/redis"
   name   = format("redis-%s-%s", var.platform, var.env)
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -212,10 +212,8 @@ resource "azurerm_user_assigned_identity" "account" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
-  tags = local.tags
-
   lifecycle {
-    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
+    ignore_changes = [tags["CreatedAt"]]
   }
 
 }
@@ -228,7 +226,7 @@ module "bot" {
     id = azurerm_user_assigned_identity.account.client_id
   }
 
-  private_dns_rg = local.pe.rg.name
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -255,7 +253,7 @@ module "di" { # Document Intelligence
 
   kind = "FormRecognizer"
 
-  private_dns_rg = local.pe.rg.name
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -288,7 +286,7 @@ module "oai" {
     ip_rules       = []
   }
 
-  private_dns_rg = local.pe.rg.name
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -315,7 +313,7 @@ module "lang" { # Language Service
 
   kind = "TextAnalytics"
 
-  private_dns_rg = local.pe.rg.name
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -351,7 +349,7 @@ module "stmlw" {
 
   name = format("sa%s%s%03d", var.platform, var.env, 2)
 
-  pe = local.pe
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -385,7 +383,7 @@ module "mlw" {
 
   kv = { id = module.kv.id }
 
-  private_dns_rg = local.pe.rg.name
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 
@@ -412,7 +410,7 @@ module "search" {
 
   identity_ids = [azurerm_user_assigned_identity.account.id]
 
-  private_dns_rg = local.pe.rg.name
+  private_dns_rg = local.pe.rg
 
   rg = local.rg
 

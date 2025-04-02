@@ -1,9 +1,11 @@
 resource "azurerm_subnet" "this" {
-  name                 = var.name
-  resource_group_name  = var.rg.name
+  name                = var.name
+  resource_group_name = var.rg.name
+
   virtual_network_name = var.vnet.name
   address_prefixes     = [var.address_prefix]
-  service_endpoints    = var.service_endpoints
+
+  service_endpoints = var.service_endpoints
 
   dynamic "delegation" {
     for_each = var.delegations

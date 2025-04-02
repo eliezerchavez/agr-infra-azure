@@ -6,16 +6,19 @@
   - [Description](#description)
   - [Requirements](#requirements)
   - [Provisioned Resources Overview](#provisioned-resources-overview)
+  - [Input Variables Overview](#input-variables-overview)
+    - [Network (`net`) Variable Details](#network-net-variable-details)
   - [Platform Components](#platform-components)
   - [Usage](#usage)
   - [Contributing](#contributing)
+    - [Accepted Conventions](#accepted-conventions)
   - [Credits](#credits)
 
 ---
 
 ## Description
 
-The Azure Open Platform provides an extensive infrastructure solution designed to support cloud native, scalable, and secure applications. Leveraging Azure cloud resources, it facilitates rapid deployment and management of diverse workloads, adhering strictly to cloud best practices for performance, security, and scalability.
+The Azure Open Platform provides an extensive infrastructure solution designed to support cloud-native, scalable, and secure applications. Leveraging Azure resources, it enables rapid deployment, streamlined management, and consistent operations for diverse workloads, strictly adhering to Azure best practices for reliability, performance, security, and scalability.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -33,16 +36,46 @@ The Azure Open Platform provides an extensive infrastructure solution designed t
 
 ## Provisioned Resources Overview
 
-This platform provisions and manages the following Azure resources:
+This platform provisions and manages the following core Azure resources:
 
-- **Resource Groups**: Logical containers for grouping resources to streamline management.
-- **Networking Resources**: Includes Virtual Networks (VNets), Subnets, Network Security Groups (NSGs), and Route Tables for secure and controlled network traffic.
-- **Azure Container Registry (ACR)**: Container registry to store and manage container images securely.
-- **Azure Kubernetes Service (AKS)**: Managed Kubernetes clusters for container orchestration and scalable deployment.
-- **Azure Redis Cache**: Provides distributed caching services to enhance performance and reduce latency.
-- **Azure PostgreSQL Flexible Server**: Managed database services with flexible scaling, high availability, and security features.
-- **Azure Key Vault**: Secure management and storage of secrets, keys, and certificates.
-- **Azure Storage Account**: Highly durable and scalable storage solutions including Blob storage and File shares.
+- **Resource Groups:**  
+  Logical containers for efficient resource organization and management.
+
+- **Networking Resources:**  
+  Includes Virtual Networks (VNets), Subnets, Network Security Groups (NSGs), and Route Tables for secure and optimized network traffic management.
+
+- **Azure Container Registry (ACR):**  
+  Secure, scalable registry for storing and managing container images.
+
+- **Azure Kubernetes Service (AKS):**  
+  Fully managed Kubernetes clusters for scalable container orchestration and application deployment.
+
+- **Azure Redis Cache:**  
+  High-performance distributed cache service to improve application responsiveness.
+
+- **Azure PostgreSQL Flexible Server:**  
+  Managed PostgreSQL database service offering scalable compute, storage, backups, and built-in high availability.
+
+- **Azure Key Vault:**  
+  Secure and compliant storage for secrets, keys, and certificates, with identity-based access controls.
+
+- **Azure Storage Account:**  
+  Highly durable, secure, and scalable storage solution supporting Blob storage, File shares, and private endpoint access.
+
+- **Azure Application Insights:**  
+  Application performance monitoring service integrated with Azure Monitor for comprehensive diagnostics and analytics.
+
+- **Azure Log Analytics Workspace:**  
+  Centralized logging solution for advanced analytics, security monitoring, and operational insights.
+
+- **Azure Cognitive Services:**  
+  Provisioning of Azure OpenAI, Document Intelligence (Form Recognizer), and Language Services (Text Analytics) with secure private endpoints.
+
+- **Azure Machine Learning Workspace:**  
+  Managed ML workspace environment with secure networking, private endpoints, and integrated identity management.
+
+- **Azure Cognitive Search:**  
+  Scalable search service integrated securely with private networks and supporting managed identities.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -55,45 +88,47 @@ This platform provisions and manages the following Azure resources:
 | `business_unit` | `string` | Yes      | n/a        | Business Unit identifier for resource naming and tagging.                     |
 | `env`           | `string` | Yes      | n/a        | Environment identifier (e.g., dev, qa, prod) for resource naming and tagging. |
 | `location`      | `string` | No       | `"eastus"` | Azure region for the platform deployment.                                     |
-| `net`           | `object` | No       | See below  |                                                                               |
+| `net`           | `object` | No       | See below  | Network configuration object for subnet and route table definitions.           |
 | `platform`      | `string` | No       | `"open"`   | Platform type identifier used in naming resources.                            |
 
 ### Network (`net`) Variable Details
 
-| Attribute                | Type          | Required | Default | Description                                                 |
-|--------------------------|---------------|----------|---------|-------------------------------------------------------------|
-| `snet.address_prefix`    | `string`      | Yes      | n/a     | Address prefix for the subnet within the VNet.              |
-| `rt.routes`              | `map(object)` | Yes      | n/a     | Route table entries.                                        |
-| `rt.routes.<name>`       | `object`      | Yes      | n/a     | Individual route entry configuration.                       |
-| `address_prefix`         | `string`      | Yes      | n/a     | Destination CIDR block for route entry.                     |
-| `next_hop_type`          | `string`      | Yes      | n/a     | Next hop type (e.g., VirtualAppliance, Internet).           |
-| `next_hop_in_ip_address` | `string`      | No       | n/a     | Next hop IP address (required if type is VirtualAppliance). |
+| Attribute                          | Type                   | Required | Default | Description                                                          |
+|------------------------------------|------------------------|----------|---------|----------------------------------------------------------------------|
+| `snet.address_prefix`              | `string`               | Yes      | n/a     | CIDR address prefix for the subnet within the Virtual Network.       |
+| `rt.routes`                        | `map(object)`          | Yes      | n/a     | Map defining custom route table entries.                             |
+| `rt.routes.<name>`                 | `object`               | Yes      | n/a     | Individual route table entry configuration object.                   |
+| `rt.routes.<name>.address_prefix`  | `string`               | Yes      | n/a     | Destination CIDR block for this route.                               |
+| `rt.routes.<name>.next_hop_type`   | `string`               | Yes      | n/a     | Type of next hop (e.g., VirtualAppliance, Internet, VnetLocal).      |
+| `rt.routes.<name>.next_hop_in_ip_address` | `string`        | No       | n/a     | Next hop IP address required when using 'VirtualAppliance' type.     |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
 ## Platform Components
 
-This platform consists of the following Terraform files:
+The platform contains the following Terraform files, logically organized for readability and maintenance:
 
-- **main.tf**:  
-  Core infrastructure resource definitions and orchestration logic.
+- **`main.tf`**  
+  Central definitions of platform resources and orchestration logic.
 
-- **variables.tf**:  
-  Defines all input variables for customizing the platform deployment.
+- **`variables.tf`**  
+  Clearly defined and documented input variables to customize platform deployment.
 
-- **locals.tf**:  
-  Contains reusable local expressions and simplified logic.
+- **`locals.tf`**  
+  Reusable and simplified local expressions to streamline code readability and reuse.
 
-- **data.tf**:  
-  Retrieves external data sources such as existing Azure resources.
+- **`data.tf`**  
+  External data sources, existing Azure resources, or configurations.
 
-- **provider.tf**:  
-  Configures Terraform providers and defines provider aliases for multi-region and multi-scope deployments.
+- **`provider.tf`**  
+  AzureRM provider configuration and provider aliases for multi-region or scoped deployments.
 
-- **versions.tf**:  
-  Specifies compatible Terraform and provider versions.
+- **`versions.tf`**  
+  Compatibility constraints specifying Terraform and AzureRM provider versions.
 
-*(Additional helper files or resources may be included as necessary.)*
+*(Additional support files may be added as needed.)*
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -101,16 +136,16 @@ This platform consists of the following Terraform files:
 
 ## Usage
 
-To deploy the Azure Open Platform, reference this example Terraform module usage snippet:
+Deploy the Azure Open Platform using the provided Terraform CLI commands below:
 
 ```bash
 source util/setenv.sh
-terraform init -chdir=terraform/platform/open -backend-config="key=platform/<platform type>/<business unit>/<env>/terraform.tfstate"
+terraform init -chdir=terraform/platform/open -backend-config="key=platform/<platform>/<business_unit>/<env>/terraform.tfstate"
 terraform plan -chdir=terraform/platform/open -var-file=vars/<env>.tfvars
 terraform apply -chdir=terraform/platform/open -var-file=vars/<env>.tfvars -auto-approve
 ```
 
-i.e.
+Example deployment:
 
 ```bash
 source util/setenv.sh
@@ -119,13 +154,15 @@ terraform plan -chdir=terraform/platform/open -var-file=vars/dev.tfvars
 terraform apply -chdir=terraform/platform/open -var-file=vars/dev.tfvars -auto-approve
 ```
 
+Replace placeholders (`<platform>`, `<business_unit>`, `<env>`) with your specific configuration values.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
 ## Contributing
 
-Contributions to enhance module functionality or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Remember to update tests as appropriate.
+Contributions to enhance platform functionality or documentation are welcome. Please open an issue or submit a pull request with your suggestions. Remember to update tests as appropriate.
 
 ### Accepted Conventions
 

@@ -1,5 +1,5 @@
 module "log" {
-  count = try(var.log.id, null) != null ? 0 : 1
+  count = try(var.workspace.id, null) != null ? 0 : 1
 
   source = "../log"
 
@@ -17,12 +17,12 @@ resource "azurerm_application_insights" "this" {
   resource_group_name = var.rg.name
 
   application_type = var.application_type
-  workspace_id     = try(var.log.id, null) != null ? var.log.id : module.log[0].id
+  workspace_id     = try(var.workspace.id, null) != null ? var.workspace.id : module.log[0].id
 
   tags = var.tags
 
   lifecycle {
-ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
+    ignore_changes = [tags["CreatedAt"], tags["CREATOR"]]
   }
 
 }

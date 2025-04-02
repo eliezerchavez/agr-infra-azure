@@ -7,12 +7,12 @@
 # 🔷 Identity / Basic Info
 variable "name" {
   type        = string
-  description = "Specifies the name of the Bot Channels Registration. Changing this forces a new resource to be created. Must be globally unique."
+  description = "Specifies the name of the resource. Must be unique within the scope of the deployment."
 }
 
 variable "rg" {
   type        = any
-  description = "The resource group where all module resources will be deployed."
+  description = "The full Resource Group object where the resource(s) will be deployed. Expected to include 'name' and 'location'."
 }
 
 # 🔐 Security / Identity
@@ -20,7 +20,7 @@ variable "application" {
   type = object({
     id = string
   })
-  description = "The Microsoft Application ID for the Bot Channels Registration"
+  description = "The Microsoft Application ID for the Bot Channels Registration."
 }
 
 # 🌐 Networking
@@ -36,24 +36,24 @@ variable "vnet" {
 variable "private_dns_rg" {
   type        = string
   default     = "RG-COMMON-NETWORKING-AZDNS"
-  description = "Resource group containing the private DNS zones"
+  description = "Name of the resource group that contains the Private DNS Zones."
 }
 
 variable "public_network_access_enabled" {
   type        = bool
   default     = false
-  description = "Whether public network access is enabled for the Bot Channels Registration"
+  description = "Whether the resource allows public network access."
 }
 
 # ⚙️ Settings / Config
 variable "sku" {
   type        = string
   default     = "F0"
-  description = "SKU tier for Bot Channels Registration (e.g. F0, S1)"
+  description = "The SKU tier for the resource (e.g., Standard, Premium). Use specific object if additional options are needed."
 }
 
 # 🏷️ Tags
 variable "tags" {
   type        = map(any)
-  description = "Tags to apply to all resources"
+  description = "Key-value tags to apply to all created resources for cost tracking, governance, and discovery."
 }
