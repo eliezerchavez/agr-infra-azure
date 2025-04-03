@@ -1,19 +1,16 @@
 <a name="readme-top"></a>
 
-# Azure Infrastructure as Code (IaC) Repository
+# Azure Infrastructure as Code (IaC)
 
-- [Azure Infrastructure as Code (IaC) Repository](#azure-infrastructure-as-code-iac-repository)
+- [Azure Infrastructure as Code (IaC)](#azure-infrastructure-as-code-iac)
   - [Description](#description)
   - [Repository Structure](#repository-structure)
-  - [Getting Started](#getting-started)
-  - [Modules](#modules)
-    - [Available Modules:](#available-modules)
   - [Platforms](#platforms)
-    - [Example Platforms:](#example-platforms)
-  - [Shared Deployments](#shared-deployments)
-    - [Examples of Shared Resources:](#examples-of-shared-resources)
-  - [Utilities](#utilities)
-    - [Key Utility Scripts:](#key-utility-scripts)
+    - [Open Platform](#open-platform)
+    - [AI Platform](#ai-platform)
+  - [Modules](#modules)
+  - [Shared Resources](#shared-resources)
+  - [Usage](#usage)
   - [Contributing](#contributing)
     - [Accepted Conventions](#accepted-conventions)
   - [Credits](#credits)
@@ -22,14 +19,14 @@
 
 ## Description
 
-This repository serves as the organization's central Infrastructure as Code (IaC) hub for managing Azure resources and deployments. It provides reusable Terraform modules, structured platform configurations, shared infrastructure solutions, and utility scripts, all aligned with Azure best practices.
+This repository provides a comprehensive, modular, and production-grade Infrastructure as Code (IaC) framework for provisioning and managing Azure environments using Terraform.
 
-The primary goals of this repository include:
+It includes:
+- Reusable, best-practice Terraform modules for Azure
+- Platform definitions for core and AI-centric cloud infrastructure
+- Shared components (e.g., VNet, ACR, Key Vault) used across all environments
 
-- **Consistency** across deployments.
-- **Scalability** to handle diverse workloads efficiently.
-- **Security and compliance** adhering to industry standards.
-- **Efficient and standardized workflows** for infrastructure provisioning.
+All configurations follow Azure naming conventions, tagging strategy, and deployment standards — empowering teams to rapidly spin up secure, scalable, and maintainable infrastructure.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -37,80 +34,12 @@ The primary goals of this repository include:
 
 ## Repository Structure
 
-The repository is structured into the following directories for clarity, maintainability, and ease of use:
-
-- **`modules/`**:  
-  Reusable Terraform modules to provision Azure services and components.
-
-- **`platforms/`**:  
-  Environment or application-specific deployments (e.g., dev, staging, prod) leveraging modules.
-
-- **`shared/`**:  
-  Infrastructure resources shared across multiple platforms and environments.
-
-- **`util/`**:  
-  Helper scripts and utilities for environment setup, Terraform state management, and common tasks.
-
-Each directory includes comprehensive `README.md` documentation detailing usage and deployment procedures.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
-
-## Getting Started
-
-To begin working with this repository, follow these steps:
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-organization/azure-infra.git
-   cd azure-infra
-   ```
-
-2. **Install required tools**:
-   - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-   - [Terraform](https://developer.hashicorp.com/terraform/downloads) (>= 1.0)
-
-3. **Authenticate to Azure**:
-   ```bash
-   az login
-   az account set --subscription "<subscription-id>"
-   ```
-
-4. **Navigate to your desired deployment** (`modules`, `platforms`, or `shared`) and follow its specific `README.md` instructions.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
-
-## Modules
-
-The `modules/` directory hosts modularized Terraform code, each encapsulating best-practice configurations for Azure resources.
-
-### Available Modules:
-
-- **`ai_ml/`**:  
-  Modules for Azure Cognitive Services, Machine Learning Workspace, Bot Services, and Cognitive Search.
-
-- **`containers/`**:  
-  Modules for Azure Kubernetes Service (AKS) and Azure Container Registry (ACR).
-
-- **`databases/`**:  
-  Modules for Azure PostgreSQL Flexible Server and Azure Redis Cache.
-
-- **`mgmt/`**:  
-  Modules for Azure Application Insights and related monitoring tools.
-
-- **`networking/`**:  
-  Modules for VNets, Subnets, Route Tables, and Network Security.
-
-- **`security/`**:  
-  Modules for managing secure resources, including Azure Key Vault.
-
-- **`storage/`**:  
-  Modules for provisioning Azure Storage Accounts and related components.
-
-Refer to each module’s `README.md` file for detailed usage instructions and examples.
+| Folder            | Description                                                                                        |
+|-------------------|----------------------------------------------------------------------------------------------------|
+| `platform/`       | Complete environment blueprints: `open/` for general workloads and `ai/` for ML/AI infrastructure. |
+| `modules/`        | Reusable and composable Terraform modules for Azure services (e.g., AKS, PostgreSQL, Key Vault).   |
+| `shared/`         | Shared infrastructure components used across platforms (e.g., hub networking, shared ACR, KV).     |
+| `util/`           | Utility scripts to simplify initialization and deployment workflows.                               |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -118,56 +47,88 @@ Refer to each module’s `README.md` file for detailed usage instructions and ex
 
 ## Platforms
 
-The `platforms/` directory contains Terraform configurations for environment-specific deployments utilizing the standardized modules.
+### [Open Platform](./platform/open/)
 
-### Example Platforms:
+The foundation for deploying scalable, secure, and cloud-native Azure infrastructure.  
+Includes:
+- AKS, ACR
+- PostgreSQL Flexible Server
+- Redis Cache
+- Key Vault, Storage, Monitoring
+- Fully integrated networking (VNet, NSGs, RTs, DNS)
 
-- **`platforms/open/`**:  
-  Reference architecture for Azure Open Platform, supporting containerized workloads, machine learning, cognitive services, and managed databases.
+> The AI Platform extends the Open Platform.
 
-- **`platforms/dev/`**:  
-  Development environment deployments.
+---
 
-- **`platforms/prod/`**:  
-  Production-grade configurations with enhanced security, scalability, and high availability.
+### [AI Platform](./platform/ai/)
 
-Each platform directory provides a detailed `README.md` outlining provisioning instructions and configurations.
+Extends the Open Platform with capabilities tailored for artificial intelligence and machine learning.  
+Includes:
+- Azure Cognitive Services (OpenAI, Language, Form Recognizer)
+- Azure Machine Learning Workspace
+- Azure Cognitive Search
+- Secure endpoints, identity, and private DNS integrations
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
-## Shared Deployments
+## Modules
 
-The `shared/` directory includes infrastructure deployments intended for reuse across multiple platforms or teams.
+All reusable Terraform modules reside in the [`modules/`](./modules/) directory.  
+They are grouped by category and designed to be composable, readable, and production-ready.
 
-### Examples of Shared Resources:
+| Category       | Examples                                                                                                                    |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------|
+| AI & ML        | [Bot Service](./modules/ai_ml/bot/), [Cognitive Services](./modules/ai_ml/cognitive/), [ML Workspace](./modules/ai_ml/mlw/) |
+| Containers     | [AKS](./modules/containers/aks/), [ACR](./modules/containers/acr/)                                                          |
+| Databases      | [PostgreSQL Flexible](./modules/databases/postgres_flexible_server/), [Redis](./modules/databases/redis_cache/)             |
+| Monitoring     | [App Insights](./modules/mgmt/appi/), [Log Analytics](./modules/networking/log/)                                            |
+| Networking     | [Subnets](./modules/networking/subnet/), [Route Tables](./modules/networking/route_table/)                                  |
+| Security       | [Key Vault](./modules/security/key_vault/)                                                                                  |
+| Storage        | [Storage Accounts](./modules/storage/storage_account/)                                                                      |
 
-- Centralized Virtual Networks (VNets), Subnets, and Route Tables.
-- Common Azure Key Vault for centralized secrets management.
-- Shared Azure Container Registry for Docker image storage and retrieval.
-
-Check the `README.md` in the `shared/` directory for detailed guidance on utilizing and managing shared resources.
+Each module contains:
+- A scoped `README.md`
+- Input/output variables
+- Example usage
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
-## Utilities
+## Shared Resources
 
-The `util/` directory provides scripts and utilities to simplify infrastructure management workflows and setup.
+Shared resources live under the [`shared/`](./shared/) directory and support multi-environment architecture.
 
-### Key Utility Scripts:
+These include:
+- Centralized VNets and Subnets
+- Shared Azure Container Registry (ACR)
+- Global Key Vault
+- DNS zones and shared networking components
 
-- **`setenv.sh`**:  
-  Bash script for environment variable setup on Unix-based systems.
+They are designed to be provisioned once and referenced across platforms.
 
-- **`setenv.ps1`**:  
-  PowerShell script for Windows-based environment variable setup.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-- Scripts for managing Terraform state, automation tasks, and infrastructure validation.
+---
 
-Refer to the utilities' `README.md` for comprehensive usage instructions.
+## Usage
+
+```bash
+# Set environment variables
+source util/setenv.sh
+
+# Example: Open Platform - Corporate Dev
+terraform -chdir=terraform/platform/open init \
+  -backend-config="key=platform/open/corporate/dev/terraform.tfstate"
+
+terraform -chdir=terraform/platform/open plan -var-file=vars/dev.tfvars
+terraform -chdir=terraform/platform/open apply -var-file=vars/dev.tfvars -auto-approve
+```
+
+Update the `<platform>/<business_unit>/<env>` values to match your specific deployment targets.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -175,13 +136,8 @@ Refer to the utilities' `README.md` for comprehensive usage instructions.
 
 ## Contributing
 
-We welcome contributions! To submit improvements or fixes:
-
-1. **Fork** the repository and **create a feature branch**.
-2. Implement your changes and perform thorough **local testing**.
-3. Submit a clearly described **pull request (PR)**.
-
-Please follow Azure's best practices and repository standards outlined below.
+Contributions to improve module functionality, platform capabilities, or documentation are welcome.  
+Please submit issues or pull requests with clearly described changes and appropriate testing.
 
 ### Accepted Conventions
 
@@ -189,14 +145,12 @@ Please follow Azure's best practices and repository standards outlined below.
 - [Abbreviation](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
 - [Tagging Strategy](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-tagging)
 
-Ensure your code adheres to these guidelines for consistency, maintainability, and security.
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
 ## Credits
 
-- [Eliezer Chavez](https://github.com/eliezerchavez) – _Initial Work, Documentation, Terraform Module Design, and Implementation._
+- [Eliezer Chavez](https://github.com/eliezerchavez) – _Initial Work, Architecture, and Documentation_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
