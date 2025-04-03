@@ -47,7 +47,7 @@ All configurations follow Azure naming conventions, tagging strategy, and deploy
 
 ## Platforms
 
-### [Open Platform](./platform/open/)
+### [Open Platform](./terraform/platform/open/)
 
 The foundation for deploying scalable, secure, and cloud-native Azure infrastructure.  
 Includes:
@@ -61,7 +61,7 @@ Includes:
 
 ---
 
-### [AI Platform](./platform/ai/)
+### [AI Platform](./terraform/platform/ai/)
 
 Extends the Open Platform with capabilities tailored for artificial intelligence and machine learning.  
 Includes:
@@ -76,7 +76,7 @@ Includes:
 
 ## Modules
 
-All reusable Terraform modules reside in the [`modules/`](./modules/) directory.  
+All reusable Terraform modules reside in the [`modules/`](./terraform/modules/) directory.  
 They are grouped by category and designed to be composable, readable, and production-ready.
 
 | Category       | Examples                                                                                                                    |
@@ -100,7 +100,7 @@ Each module contains:
 
 ## Shared Resources
 
-Shared resources live under the [`shared/`](./shared/) directory and support multi-environment architecture.
+Shared resources live under the [`shared/`](./terraform/shared/) directory and support multi-environment architecture.
 
 These include:
 - Centralized VNets and Subnets
